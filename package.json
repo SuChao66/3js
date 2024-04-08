@@ -8,7 +8,8 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
     "prettier": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "commit": "git add . && cz-customizable"
   },
   "dependencies": {
     "element-plus": "^2.6.3",
@@ -24,6 +25,10 @@
     "@types/node": "^20.12.5",
     "@vitejs/plugin-legacy": "^5.3.2",
     "@vitejs/plugin-vue": "^5.0.4",
+    "commitizen": "^4.3.0",
+    "commitlint-config-cz": "^0.13.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "cz-customizable": "^7.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -43,5 +48,13 @@
       "npm run lint",
       "prettier --write"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": ".cz-config.cjs"
+    }
   }
 }
