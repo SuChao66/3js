@@ -6,12 +6,16 @@
 
 <script lang="ts" setup>
 import { useStore } from '@/store'
+import { ref } from 'vue'
 
 const { global, counter } = useStore()
 
 const increment = () => {
   counter.increment()
 }
+
+const count = ref(0)
+console.log(count)
 </script>
 
 <style lang="less" scoped></style>

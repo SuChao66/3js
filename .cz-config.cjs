@@ -5,19 +5,19 @@ module.exports = {
       name: '✨ feat:     新功能'
     },
     {
-      value: '  fix:',
-      name: '  fix:      修复bug'
+      value: '🔧 fix:',
+      name: '🔧  fix:      修复bug'
     },
     {
-      value: ' ️ build:',
-      name: ' ️ build:    打包'
+      value: '📦 build:',
+      name: '📦 build:    打包'
     },
     {
       value: '⚡️ perf:',
       name: '⚡️ perf:     性能优化'
     }, {
-      value: '  release:',
-      name: '  release:  发布正式版'
+      value: '🎺 release:',
+      name: '🎺  release:  发布正式版'
     }, {
       value: '  style:',
       name: '  style:    代码的样式美化'
