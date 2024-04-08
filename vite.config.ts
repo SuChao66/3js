@@ -8,9 +8,54 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 // 引入自动导入 api
 import AutoImport from 'unplugin-auto-import/vite'
+// 性能分析：打包体积可视化
+import { visualizer } from 'rollup-plugin-visualizer'
+// 兼容传统浏览器
+import legacy from '@vitejs/plugin-legacy'
+
+const vendorLibs: { match: string[]; output: string }[] = [
+  {
+    match: ['element-plus'],
+    output: 'elementPlus'
+  },
+  {
+    match: ['echarts'],
+    output: 'echarts'
+  }
+]
+// 手动拆包
+export const configManualChunk = (id: string) => {
+  if (/[\\/]node_modules[\\/]/.test(id)) {
+    const matchItem = vendorLibs.find((item) => {
+      const reg = new RegExp(
+        `[\\/]node_modules[\\/]_?(${item.match.join('|')})(.*)`,
+        'ig'
+      )
+      return reg.test(id)
+    })
+    return matchItem ? matchItem.output : null
+  }
+}
 
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   return {
+    base: './',
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src')
+      }
+    },
+    server: {
+      port: 8080
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: configManualChunk
+        }
+      },
+      chunkSizeWarningLimit: 1024
+    },
     plugins: [
       vue(),
       AutoImport({
@@ -24,13 +69,19 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         // 导入存放的位置
         dts: 'src/types/components.d.ts',
         resolvers: [ElementPlusResolver()]
+      }),
+      // 打包可视化
+      visualizer({
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+        filename: './node_modules/.cache/visualizer/stats.html'
+      }),
+      // 兼容传统浏览器
+      legacy({
+        targets: ['ie >= 11'],
+        additionalLegacyPolyfills: ['regenerator-runtime/runtime']
       })
-    ],
-    resolve: {
-      alias: {
-        '@': resolve(__dirname, './src')
-      }
-    },
-    base: './'
+    ]
   }
 })
