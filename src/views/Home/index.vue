@@ -6,7 +6,6 @@
 
 <script lang="ts" setup>
 import { useStore } from '@/store'
-import { ref } from 'vue'
 
 const { global, counter } = useStore()
 
