@@ -1,7 +1,7 @@
-<template>hello world</template>
+<template>
+  <router-view />
+</template>
 
-<script setup lang="ts">
-console.log("my config env: ", import.meta.env);
-</script>
+<script setup lang="ts"></script>
 
 <style scoped></style>

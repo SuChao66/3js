@@ -1,0 +1,20 @@
+# 控制 .editorconfig 是否生效的字段
+root = true
+# 表示所有文件适用
+[*]
+# 设置文件字符集为 utf-8
+charset = utf-8
+# 缩进风格（tab | space）
+indent_style = space
+# 缩进大小，缩进的空格数
+indent_size = 2
+# 控制换行类型(lf | cr | crlf)
+end_of_line = lf
+# 删除一行中的空白字符
+trim_trailing_whitespace = true
+# 始终在文件末尾插入一个新行
+insert_final_newline = true
+# 表示仅 md 文件适用以下规则
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
