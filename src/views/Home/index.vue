@@ -1,20 +1,16 @@
 <template>
-  <div>{{ global.title }}</div>
-  <el-button type="primary" @click="increment">+1</el-button>
-  当前计数：{{ counter.count }}
+  <div class="home">
+    <el-container>
+      <Header />
+      <el-main>Main</el-main>
+    </el-container>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { useStore } from '@/store'
-
-const { global, counter } = useStore()
-
-const increment = () => {
-  counter.increment()
-}
-
-const count = ref(0)
-console.log(count)
+import Header from '@/components/Header/index.vue'
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+@import './index.less';
+</style>

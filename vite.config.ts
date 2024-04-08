@@ -12,6 +12,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 // 兼容传统浏览器
 import legacy from '@vitejs/plugin-legacy'
+// svg插件
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 
 const vendorLibs: { match: string[]; output: string }[] = [
   {
@@ -90,6 +92,12 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       legacy({
         targets: ['ie >= 11'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime']
+      }),
+      createSvgIconsPlugin({
+        // 指定需要缓存的图标文件夹
+        iconDirs: [resolve(process.cwd(), 'src/assets/svg')],
+        // 指定symbolId格式
+        symbolId: 'icon-[dir]-[name]'
       })
     ]
   }
