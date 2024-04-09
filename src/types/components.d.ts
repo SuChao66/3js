@@ -9,6 +9,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
+    ElCarousel: typeof import('element-plus/es')['ElCarousel']
+    ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
@@ -17,6 +19,7 @@ declare module 'vue' {
     ElFooter: typeof import('element-plus/es')['ElFooter']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElImage: typeof import('element-plus/es')['ElImage']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElRow: typeof import('element-plus/es')['ElRow']
     Header: typeof import('./../components/Header/index.vue')['default']
@@ -26,5 +29,6 @@ declare module 'vue' {
     SGitHub: typeof import('./../components/SGitHub/index.vue')['default']
     STheme: typeof import('./../components/STheme/index.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
+    Swiper: typeof import('./../components/Swiper/index.vue')['default']
   }
 }

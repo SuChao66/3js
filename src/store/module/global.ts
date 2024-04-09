@@ -22,7 +22,7 @@ const useGlobalState = defineStore('global', {
   persist: {
     key: 'global',
     storage: window.localStorage,
-    paths: ['title']
+    paths: ['locale', 'theme']
   }
 })
 
