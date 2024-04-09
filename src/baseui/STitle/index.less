@@ -1,0 +1,17 @@
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    margin-top: 40px;
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--primary-color);
+  }
+}
