@@ -12,15 +12,6 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Home'
     },
     component: () => import('@/views/Home/index.vue')
-  },
-  // 页面不存在时的路由
-  {
-    name: 'About',
-    path: '/about',
-    meta: {
-      title: 'About'
-    },
-    component: () => import('@/views/About/index.vue')
   }
 ]
 

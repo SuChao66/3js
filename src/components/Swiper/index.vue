@@ -16,31 +16,22 @@
 </template>
 
 <script setup lang="ts">
-import merry_card from '@/assets/images/merry_card.png'
-import robot from '@/assets/images/robot.png'
-import earthMoon from '@/assets/images/earth_moon.png'
-import happy_new_year from '@/assets/images/happy_new_year.png'
-import island from '@/assets/images/island.png'
-import smart_factory from '@/assets/images/smart_factory.png'
-import vr_room from '@/assets/images/vr_room.png'
+import room from '@/assets/images/room.jpeg'
+import bigScreen from '@/assets/images/big-screen.jpeg'
+import human from '@/assets/images/3d-human.png'
+import internetOfThings from '@/assets/images/3d-lianwang.jpeg'
+import mall from '@/assets/images/3d-mall.jpg'
+import park from '@/assets/images/3d-park.png'
+// 导入类型
+import type { IProps } from './types'
 
 // 0.定义props
-const props = defineProps({
-  height: {
-    type: String,
-    default: '400px'
-  }
+const props = withDefaults(defineProps<IProps>(), {
+  height: '450px'
 })
+const { height } = toRefs(props)
 
-const images = [
-  vr_room,
-  merry_card,
-  robot,
-  island,
-  smart_factory,
-  earthMoon,
-  happy_new_year
-]
+const images = [room, bigScreen, human, internetOfThings, mall, park]
 </script>
 
 <style lang="less" scoped>

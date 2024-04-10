@@ -1,6 +1,8 @@
 <template>
   <div class="card" :style="cardStyle(card.key)">
-    {{ card.title }}
+    <img :src="card.img" class="cover-bg" />
+    <div class="title">{{ card.title }}</div>
+    <div class="desc">{{ card.desc }}</div>
   </div>
 </template>
 
@@ -12,9 +14,11 @@ import type { IProps } from './types'
 const props = withDefaults(defineProps<IProps>(), {
   card: () => ({
     key: 0,
-    title: ''
+    title: '',
+    img: '',
+    desc: ''
   }),
-  column: 4,
+  column: 5,
   margin: () => [0, 20, 20, 0]
 })
 const { card, column, margin } = toRefs(props)
