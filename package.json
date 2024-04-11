@@ -14,11 +14,13 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@types/nprogress": "^0.2.3",
+    "@types/three": "^0.148.0",
     "element-plus": "^2.6.3",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "three": "^0.148.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
