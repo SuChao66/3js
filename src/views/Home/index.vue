@@ -9,7 +9,7 @@
         <STitle title="作品集" />
         <div class="example-list" v-if="isRender">
           <SCard
-            v-for="item in exampleList"
+            v-for="item in exmaples.exampleList"
             :key="item.key"
             :card="item"
             :column="column"
@@ -26,12 +26,12 @@ import Header from '@/components/Header/index.vue'
 import Swiper from '@/components/Swiper/index.vue'
 import STitle from '@/baseui/STitle/index.vue'
 import SCard from '@/baseui/SCard/index.vue'
-// 导入类型
-import type { ICard } from '@/type'
-import room from '@/assets/images/3d-lianwang.jpeg'
 // 导入hook
 import { useWindowSize } from '@/hooks'
+// 导入store
+import { useStore } from '@/store'
 
+const { exmaples } = useStore()
 const { width } = useWindowSize()
 // 是否渲染作品card
 const isRender = ref<boolean>(true)
@@ -59,39 +59,6 @@ watch(
   },
   { immediate: true, deep: true }
 )
-
-const exampleList = reactive<ICard[]>([
-  {
-    key: 1,
-    title: '元宇宙',
-    img: room,
-    desc: '元宇宙，畅想无限未来'
-  },
-  {
-    key: 2,
-    title: '元宇宙',
-    img: room,
-    desc: '元宇宙，畅想无限未来'
-  },
-  {
-    key: 3,
-    title: '元宇宙',
-    img: room,
-    desc: '元宇宙，畅想无限未来'
-  },
-  {
-    key: 4,
-    title: '元宇宙',
-    img: room,
-    desc: '元宇宙，畅想无限未来元宇宙，畅想无限未来元宇宙，畅想无限未来元宇宙，畅想无限未来元宇宙，畅想无限未来'
-  },
-  {
-    key: 5,
-    title: '元宇宙',
-    img: room,
-    desc: '元宇宙，畅想无限未来'
-  }
-])
 </script>
 
 <style lang="less" scoped>

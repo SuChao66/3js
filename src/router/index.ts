@@ -3,6 +3,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 // 导入NProgress
 import { NProgress } from '@/global'
+// 导入路由
+import { exampleRoutes } from './exampleRoutes'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -12,7 +14,8 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Home'
     },
     component: () => import('@/views/Home/index.vue')
-  }
+  },
+  ...exampleRoutes
 ]
 
 const router = createRouter({

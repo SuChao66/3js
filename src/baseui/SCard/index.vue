@@ -1,5 +1,9 @@
 <template>
-  <div class="card" :style="cardStyle(card.key)">
+  <div
+    class="card"
+    :style="cardStyle(card.key)"
+    @click="handleClick(card.path)"
+  >
     <img :src="card.img" class="cover-bg" />
     <div class="title">{{ card.title }}</div>
     <div class="desc">{{ card.desc }}</div>
@@ -10,13 +14,17 @@
 import { computed, toRefs } from 'vue'
 // 导入类型
 import type { IProps } from './types'
+// 导入路由
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const props = withDefaults(defineProps<IProps>(), {
   card: () => ({
     key: 0,
     title: '',
     img: '',
-    desc: ''
+    desc: '',
+    path: ''
   }),
   column: 5,
   margin: () => [0, 20, 20, 0]
@@ -38,6 +46,13 @@ const cardStyle = computed(() => {
     }
   }
 })
+
+// 点击跳转
+const handleClick = (path: string) => {
+  router.push({
+    name: path
+  })
+}
 </script>
 
 <style lang="less" scoped>

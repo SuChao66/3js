@@ -3,4 +3,5 @@ export interface ICard {
   key: number
   img: string
   desc?: string
+  path: string
 }

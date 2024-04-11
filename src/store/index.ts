@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 // 导入子模块
 import useGlobalState from './module/global'
-import useCounterStore from './module/counter'
+import useExampleStore from './module/examples'
 
 const store = createPinia()
 // 使用数据持久化插件
@@ -13,7 +13,7 @@ store.use(piniaPluginPersistedState)
 export const useStore = () => {
   return {
     global: useGlobalState(),
-    counter: useCounterStore()
+    exmaples: useExampleStore()
   }
 }
 
