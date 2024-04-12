@@ -1,12 +1,22 @@
 <template>
   <div class="smart-factory">
-    <div class="btn-operation">
+    <div class="btn-operation" v-if="!isLoading">
       <el-button size="large" plain round @click="handlePlay">
         {{ isPlaying ? '暂停' : '播放' }}
       </el-button>
-      <el-button size="large" plain round @click="handleRain"> 下雨 </el-button>
+      <el-button size="large" plain round @click="handleEnvironment('rain')">
+        下雨
+      </el-button>
+      <el-button size="large" plain round @click="handleEnvironment('snow')">
+        下雪
+      </el-button>
     </div>
+    <!-- 性能监视器 -->
     <div ref="statusRef"></div>
+    <!-- 加载动画 -->
+    <transition name="fade">
+      <SLoading v-if="isLoading" :currentProgress="currentProgress" />
+    </transition>
     <canvas id="webgl"></canvas>
   </div>
 </template>
@@ -24,107 +34,55 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 // 导入hooks
 import { useWindowSize } from '@/hooks'
+import { useThree } from './hook/useThree.ts'
+// 导入组件
+import SLoading from '@/baseui/SLoading/index.vue'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
 // 性能监视器
 const statusRef = ref<HTMLDivElement | null>(null)
 // 动画是否在播放
-const isPlaying = ref<boolean>(false)
+const isPlaying = ref<boolean>(true)
 // 精灵个数
-const N = 16000
+const N = 8000
+// 当前环境中的效果，下雨/下雪
+let currentEnvironemnt: string = null
+// 模型加载进度
+const currentProgress = ref<number>(0)
+// 是否加载进度条
+const isLoading = ref<boolean>(true)
 // three变量
 let scene: THREE.Scene,
   camera: THREE.PerspectiveCamera,
-  renderer: THREE.WebGLRender,
+  renderer: THREE.WebGLRenderer,
   status: Status,
   controls: OrbitControls,
   mixer: THREE.AnimationMixer,
   clipAction: THREE.AnimationAction,
   spriteGroup: THREE.Group
+let timer = null
 
-// 2.初始化
-const init = () => {
-  // 2.1.创建场景
-  initScene()
-  // 2.2.辅助观察坐标系
-  initHelper()
-  // 2.3.设置光源
-  initLights()
-  // 2.4.创建相机
-  initCamera()
-  // 2.5.创建渲染器
-  initRender()
-  // 2.6.加载模型
-  // initModel()
-  // 2.7.初始化性能监视器
-  initStatus()
-  // 2.8.初始化相机控件
-  initControls()
-  // 渲染
+const { initThree } = useThree()
+onMounted(() => {
+  const {
+    scene: mScene,
+    camera: mCamera,
+    renderer: mRenderer,
+    controls: mControls,
+    status: mStatus
+  } = initThree(document.getElementById('webgl') as HTMLCanvasElement)
+  scene = mScene
+  camera = mCamera
+  status = mStatus
+  controls = mControls
+  renderer = mRenderer
+  statusRef.value.appendChild(mStatus.dom)
+  // 加载模型
+  initModel()
+  // 播放动画
   animate()
-}
-
-// 初始化场景
-const initScene = () => {
-  scene = new THREE.Scene()
-  scene.fog = new THREE.Fog(0xffffff, 0.5)
-  // 设置天空盒
-  initHDR()
-}
-
-const initHDR = () => {
-  // 初始化hdr加载器
-  const hdrLoader = new RGBELoader()
-  hdrLoader.load('./hdr/sky1.hdr', (texture) => {
-    // 设置图像将如何应用到物体（对象）上，像圆一样四周环绕整个场景
-    texture.mapping = THREE.EquirectangularReflectionMapping
-    scene.background = texture
-    scene.environment = texture
-  })
-}
-
-// 初始化观察坐标系
-const initHelper = () => {
-  const axesHelper = new THREE.AxesHelper(50)
-  scene.add(axesHelper)
-}
-
-// 设置光源
-const initLights = () => {
-  // 3.1.平行光
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-  directionalLight.position.set(100, 60, 50)
-  scene.add(directionalLight)
-  // 3.2.环境光
-  const ambient = new THREE.AmbientLight(0xffffff, 0.4)
-  scene.add(ambient)
-}
-
-// 创建相机
-const initCamera = () => {
-  const width = window.innerWidth
-  const height = window.innerHeight
-  camera = new THREE.PerspectiveCamera(30, width / height, 10, 3000)
-  // 设置相机的位置
-  camera.position.set(202, 123, 125)
-  // 设置相机的朝向
-  camera.lookAt(0, 0, 0)
-}
-
-// 创建渲染器
-const initRender = () => {
-  renderer = new THREE.WebGLRenderer({
-    canvas: document.getElementById('webgl') as HTMLCanvasElement,
-    antialias: true // 抗锯齿
-  })
-  // 设置设备像素比
-  renderer.setPixelRatio(window.devicePixelRatio)
-  // 设置输出画布大小
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  // 设置颜色空间
-  renderer.outputEncoding = THREE.sRGBEncoding
-}
+})
 
 // 加载模型
 const initModel = () => {
@@ -141,16 +99,22 @@ const initModel = () => {
       clipAction.play()
       // 暂停状态
       clipAction.paused = true
+      // 默认下雨效果
+      handleEnvironment('rain')
     },
     (xhr) => {
-      console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+      currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
+      if (currentProgress.value === 100) {
+        setTimeout(() => {
+          isLoading.value = false
+        }, 3000)
+      }
     }
   )
 }
 
-// 模拟场景中下雨的效果
-const initRain = () => {
-  const texture = new THREE.TextureLoader().load('./images/sprite/rain.png')
+// 模拟场景中下雨或者下雪的效果
+const initRainOrSnow = (texture) => {
   const spriteMaterial = new THREE.SpriteMaterial({
     map: texture
   })
@@ -167,36 +131,14 @@ const initRain = () => {
   }
 }
 
-// 初始化性能监视器
-const initStatus = () => {
-  status = new Status()
-  statusRef.value.appendChild(status.dom)
-}
-
-//初始化相机控件
-const initControls = () => {
-  controls = new OrbitControls(camera, renderer.domElement)
-  controls.target.set(0, 0, 0)
-  // 开启缓动动画
-  controls.enableDamping = true
-  controls.enablePan = false
-  controls.enableZoom = true
-  // 内外移动距离
-  controls.maxDistance = 400
-  controls.minDistance = 100
-  // 最大仰角
-  controls.minPolarAngle = 0
-  controls.maxPolarAngle = Math.PI / 2
-}
-
 // 渲染
 const clock = new THREE.Clock()
 const animate = () => {
   // 获取上下两针时间间隔
   const delta = clock.getDelta()
   // 设置渲染器输出画布大小
-  renderer.render(scene, camera)
-  requestAnimationFrame(animate)
+  renderer && renderer.render(scene, camera)
+  timer = requestAnimationFrame(animate)
   // 更新性能监视器
   status && status.update()
   // 更新相机控制器
@@ -206,12 +148,50 @@ const animate = () => {
   // 更新雨滴的位置
   if (spriteGroup) {
     spriteGroup.children.forEach((sprite) => {
-      // 雨滴的y坐标每次减t*60
-      sprite.position.y -= 60 * delta
+      // 雨滴或者雪的y坐标每次减t*60
+      sprite.position.y -= 50 * delta
+      // 如果是下雪，改变雪花的姿态
+      if (currentEnvironemnt === 'snow') {
+        sprite.rotateZ(Math.PI * delta * 50)
+      }
       if (sprite.position.y < 0) {
         sprite.position.y = 600
       }
     })
+  }
+}
+
+// 播放动画
+const handlePlay = () => {
+  if (clipAction && clipAction.paused) {
+    // 暂停状态
+    clipAction.paused = false
+    isPlaying.value = true
+  } else {
+    clipAction.paused = true
+    isPlaying.value = false
+  }
+}
+
+// 模拟下雨/下雪效果
+const handleEnvironment = (type: string) => {
+  // 1.判断场景中是否有下雨或者下雪的效果
+  if (spriteGroup) {
+    spriteGroup.traverse((item) => {
+      if (item.type === 'Sprite') {
+        item.material.dispose()
+      }
+    })
+    scene.remove(spriteGroup)
+  }
+  if (type === 'rain') {
+    const texture = new THREE.TextureLoader().load('./images/sprite/rain.png')
+    currentEnvironemnt = 'rain'
+    initRainOrSnow(texture)
+  } else {
+    const texture = new THREE.TextureLoader().load('./images/sprite/snow.png')
+    currentEnvironemnt = 'snow'
+    initRainOrSnow(texture)
   }
 }
 
@@ -230,23 +210,6 @@ const handleResize = (width, height) => {
   }
 }
 
-// 播放动画
-const handlePlay = () => {
-  if (clipAction && clipAction.paused) {
-    // 暂停状态
-    clipAction.paused = false
-    isPlaying.value = true
-  } else {
-    clipAction.paused = true
-    isPlaying.value = false
-  }
-}
-
-// 模拟下雨效果
-const handleRain = () => {
-  initRain()
-}
-
 watch(
   () => [width, height],
   ([newWidth, newHeight]) => {
@@ -255,9 +218,21 @@ watch(
   { immediate: true, deep: true }
 )
 
-onMounted(() => {
-  init()
-  // 监听窗口变化
+onUnmounted(() => {
+  renderer.domElement.remove()
+  renderer.clear()
+  scene.traverse((item) => {
+    if (item.isMesh) {
+      item.geometry.dispose()
+      item.material.dispose()
+      if (item.texture) {
+        item.texture.dispose()
+      }
+      scene.remove(item)
+    }
+  })
+  scene = null
+  cancelAnimationFrame(timer)
 })
 </script>
 
