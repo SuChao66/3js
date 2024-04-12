@@ -30,8 +30,6 @@ import Status from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入GLTF加载器
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-// 导入RGBELoader
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 // 导入hooks
 import { useWindowSize } from '@/hooks'
 import { useThree } from './hook/useThree.ts'
@@ -43,7 +41,7 @@ const { width, height } = useWindowSize()
 // 性能监视器
 const statusRef = ref<HTMLDivElement | null>(null)
 // 动画是否在播放
-const isPlaying = ref<boolean>(true)
+const isPlaying = ref<boolean>(false)
 // 精灵个数
 const N = 8000
 // 当前环境中的效果，下雨/下雪
@@ -52,6 +50,8 @@ let currentEnvironemnt: string = null
 const currentProgress = ref<number>(0)
 // 是否加载进度条
 const isLoading = ref<boolean>(true)
+// 定时器
+const timer = ref<number>(0)
 // three变量
 let scene: THREE.Scene,
   camera: THREE.PerspectiveCamera,
@@ -61,7 +61,6 @@ let scene: THREE.Scene,
   mixer: THREE.AnimationMixer,
   clipAction: THREE.AnimationAction,
   spriteGroup: THREE.Group
-let timer = null
 
 const { initThree } = useThree()
 onMounted(() => {
@@ -138,7 +137,7 @@ const animate = () => {
   const delta = clock.getDelta()
   // 设置渲染器输出画布大小
   renderer && renderer.render(scene, camera)
-  timer = requestAnimationFrame(animate)
+  timer.value = requestAnimationFrame(animate)
   // 更新性能监视器
   status && status.update()
   // 更新相机控制器

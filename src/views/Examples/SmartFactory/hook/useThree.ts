@@ -27,7 +27,7 @@ export const useThree = () => {
     const axesHelper = initHelper()
     scene.add(axesHelper)
     // 2.3.设置天空盒
-    initHDR('/hdr/sky1.hdr').then((texture: any) => {
+    initHDR('./hdr/sky1.hdr').then((texture: any) => {
       scene.background = texture
       scene.environment = texture
     })

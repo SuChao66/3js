@@ -32,7 +32,7 @@ const locales = reactive([
 const currentLocale = computed(() => {
   return locales.filter((item) => item.key === global.locale)[0].title
 })
-const handleCommand = (command: string | number | object) => {
+const handleCommand = (command: string) => {
   global.SET_LOCALE(command)
 }
 </script>
