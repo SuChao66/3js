@@ -42,16 +42,14 @@ watch(
   () => width,
   (val) => {
     isRender.value = false
-    if (val.value < 300) {
+    if (val.value < 400) {
       column.value = 1
-    } else if (val.value < 550) {
+    } else if (val.value < 700) {
       column.value = 2
-    } else if (val.value < 800) {
+    } else if (val.value < 1000) {
       column.value = 3
-    } else if (val.value < 1200) {
-      column.value = 4
     } else {
-      column.value = 5
+      column.value = 4
     }
     setTimeout(() => {
       isRender.value = true

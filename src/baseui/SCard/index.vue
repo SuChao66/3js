@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<IProps>(), {
     desc: '',
     path: ''
   }),
-  column: 5,
+  column: 4,
   margin: () => [0, 20, 20, 0]
 })
 const { card, column, margin } = toRefs(props)
