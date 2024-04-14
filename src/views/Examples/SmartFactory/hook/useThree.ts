@@ -34,8 +34,8 @@ export const useThree = () => {
     // 2.1.创建场景
     const scene = initScene()
     // 2.2.辅助观察坐标系
-    const axesHelper = initHelper()
-    scene.add(axesHelper)
+    // const axesHelper = initHelper()
+    // scene.add(axesHelper)
     // 2.3.设置天空盒
     initHDR('./hdr/sky1.hdr').then((texture: any) => {
       scene.background = texture

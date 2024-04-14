@@ -10,6 +10,9 @@
       <el-button size="large" plain round @click="handleEnvironment('snow')">
         下雪
       </el-button>
+      <el-button size="large" plain round @click="handleFly">
+        {{ isFlyPlaying ? '退出巡厂' : '无人机巡场' }}
+      </el-button>
     </div>
     <!-- 标签 -->
     <div id="tag" style="display: none">
@@ -52,8 +55,8 @@ import { useThree } from './hook/useThree.ts'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STag from './components/STag/index.vue'
-// 导入类型
-import type { ICunChu } from './types'
+// 导入配置文件
+import { cunchuInfo } from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -71,41 +74,43 @@ let currentEnvironemnt: string = ''
 const currentProgress = ref<number>(0)
 // 是否加载进度条
 const isLoading = ref<boolean>(true)
-// 定时器
+// 场景定时器
 const timer = ref<number>(0)
+// 无人机定时器
+const flyTimer = ref<number>(0)
+// 是否正在无人机巡厂
+const isFlyPlaying = ref<boolean>(false)
 // three变量
-let scene: THREE.Scene | null,
-  model: THREE.Group,
-  camera: THREE.PerspectiveCamera,
-  renderer: THREE.WebGLRenderer,
-  css2Renderer: CSS2DRenderer,
-  status: Status,
-  controls: OrbitControls,
-  mixer: THREE.AnimationMixer,
-  clipAction: THREE.AnimationAction,
-  spriteGroup: THREE.Group,
-  selectModel: THREE.Object3D,
-  cameraPos: THREE.Vector3,
-  controlsTarget: THREE.Vector3
-// 存储罐信息
-const cunchuInfo: ICunChu = {
-  设备A: {
-    title: '设备A',
-    counter: 200021,
-    status: 0
-  },
-  设备B: {
-    title: '设备B',
-    counter: 19011,
-    status: -1
-  }
-}
+let scene: THREE.Scene | null, // 场景
+  model: THREE.Group, // 工厂模型
+  fly: THREE.Group, // 无人机模型
+  camera: THREE.PerspectiveCamera, // 相机
+  renderer: THREE.WebGLRenderer, // 渲染器
+  css2Renderer: CSS2DRenderer, // 标签渲染器
+  status: Status, // 性能监视器
+  controls: OrbitControls, // 相机控制器
+  mixer: THREE.AnimationMixer, // 动画播放器（卡车）
+  planeMixer: THREE.AnimationMixer, // 动画播放器（无人机）
+  clipAction: THREE.AnimationAction, /// 卡车动画
+  planeClipAction: THREE.AnimationAction, /// 无人机动画
+  spriteGroup: THREE.Group, // 精灵模型
+  selectModel: THREE.Object3D, // 选择的模型
+  cameraPos: THREE.Vector3, // 相机初始位置
+  controlsTarget: THREE.Vector3 // 相机初始target
 // 当前选择的存储罐
 const currentSelectModel = ref<string>('')
 // tag标签
 let tag: CSS2DObject
+// 定义无人机绕飞半径和高度
+const flyInfo = {
+  R: 120,
+  H: 50
+}
+// 无人机的停放位置
+const flyPosition = new THREE.Vector3(-25, 0, 10)
 
 const { initThree } = useThree()
+
 onMounted(() => {
   const {
     scene: mScene,
@@ -163,30 +168,30 @@ const initModel = () => {
     (xhr) => {
       currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
       if (currentProgress.value === 100) {
+        // 加载无人机模型
+        initPlaneModel()
         setTimeout(() => {
           isLoading.value = false
-        }, 3000)
+        }, 1000)
       }
     }
   )
 }
 
-// 模拟场景中下雨或者下雪的效果
-const initRainOrSnow = (texture: THREE.Texture) => {
-  const spriteMaterial = new THREE.SpriteMaterial({
-    map: texture
+// 加载无人机
+const initPlaneModel = () => {
+  const loader = new GLTFLoader()
+  loader.load('./models/plane.glb', (gltf) => {
+    fly = new THREE.Group()
+    fly.scale.set(0.25, 0.25, 0.25)
+    fly.position.set(-25, 0, 10)
+    fly.add(gltf.scene)
+    scene!.add(fly)
+    // 播放无人机动画
+    planeMixer = new THREE.AnimationMixer(gltf.scene)
+    // 获取gltf.animations[0]的第一个clip动画对象
+    planeClipAction = planeMixer.clipAction(gltf.animations[0])
   })
-  spriteGroup = new THREE.Group()
-  scene!.add(spriteGroup)
-  for (let i = 0; i < N; i++) {
-    const sprite = new THREE.Sprite(spriteMaterial)
-    spriteGroup.add(sprite)
-    // 设置精灵模型位置，在长方体空间中随机分布
-    const x = 1000 * (Math.random() - 0.5)
-    const y = 600 * Math.random()
-    const z = 1000 * (Math.random() - 0.5)
-    sprite.position.set(x, y, z)
-  }
 }
 
 // 渲染
@@ -204,8 +209,10 @@ const animate = () => {
   status && status.update()
   // 更新相机控制器
   controls && controls.update()
-  // 更新动画时间
+  // 更新卡车动画时间
   mixer && mixer.update(delta)
+  // 更新无人机动画时间
+  planeMixer && planeMixer.update(delta)
   // 更新TWEEN
   TWEEN.update()
   // 更新雨滴的位置
@@ -224,7 +231,7 @@ const animate = () => {
   }
 }
 
-// 播放动画
+// 播放卡车动画
 const handlePlay = () => {
   if (clipAction && clipAction.paused) {
     // 暂停状态
@@ -233,6 +240,140 @@ const handlePlay = () => {
   } else {
     clipAction.paused = true
     isPlaying.value = false
+  }
+}
+
+// 无人机巡厂
+const handleFly = () => {
+  if (isFlyPlaying.value) {
+    restoryfFly()
+    return
+  } else {
+    executeFly()
+  }
+}
+
+// 无人机停放到初始位置
+const restoryfFly = () => {
+  // 停止无人机巡厂
+  cancelAnimationFrame(flyTimer.value)
+  // 获取无人机的位置
+  const flyWorldPosition = new THREE.Vector3()
+  fly.getWorldPosition(flyWorldPosition)
+  // 设置无人机停放的位置
+  new TWEEN.Tween({
+    x: flyWorldPosition.x,
+    y: flyWorldPosition.y,
+    z: flyWorldPosition.z
+  })
+    .to({
+      x: flyPosition.x,
+      y: flyPosition.y,
+      z: flyPosition.z
+    })
+    .onUpdate((obj) => {
+      fly.position.x = obj.x
+      fly.position.y = obj.y
+      fly.position.z = obj.z
+    })
+    .onComplete(() => {
+      // 恢复完整视角
+      createCameraTween(cameraPos, controlsTarget)
+      planeClipAction.stop()
+      isFlyPlaying.value = false
+    })
+    .start()
+}
+
+// 执行飞行动画
+const executeFly = () => {
+  // 1.播放无人机动画
+  planeClipAction.play()
+  isFlyPlaying.value = true
+  // 2.无人机起飞至指定位置
+  new TWEEN.Tween({ x: -25, y: 0 })
+    .to({ x: -flyInfo.R, y: flyInfo.H }, 5000)
+    .onUpdate((obj) => {
+      fly.position.x = obj.x
+      fly.position.y = obj.y
+      // 保持无人机镜头一直对准旋转中心
+      const b = target.clone().sub(fly.position).normalize()
+      // 计算当前位置相对初始位置需要旋转的角度
+      const q = new THREE.Quaternion()
+      q.setFromUnitVectors(a, b) // a到b向量旋转的角度
+      const newQ = q0.clone().multiply(q)
+      fly.quaternion.copy(newQ)
+    })
+    .onComplete(() => {
+      // 获取无人机的世界坐标
+      const flyWorldPosition = new THREE.Vector3()
+      fly.getWorldPosition(flyWorldPosition)
+      // 计算相机的位置
+      const endPositionX = flyWorldPosition.clone().x - 10
+      const endPositionY = flyWorldPosition.clone().y + 2
+      const endPositionZ = flyWorldPosition.clone().z
+      const endPosition = new THREE.Vector3(
+        endPositionX,
+        endPositionY,
+        endPositionZ
+      )
+      // 相机移动
+      createCameraTween(endPosition, flyWorldPosition)
+      // 执行绕飞运动
+      setTimeout(() => {
+        loop()
+      }, 2500)
+    })
+    .start()
+  // 3.无人机朝向（无人机相机镜头方向）
+  const a = new THREE.Vector3(0, 0, 1)
+  // 绕转中心的坐标
+  const target = new THREE.Vector3(0, flyInfo.H, 0)
+  // 无人机姿态角度初始值
+  const q0 = fly.quaternion.clone()
+  // 定义开始角度
+  let angle = 0
+  function loop() {
+    flyTimer.value = requestAnimationFrame(loop)
+    angle += 0.005
+    // 无人机y坐标不变，在平行于X0Z的平面上做圆周运动
+    const x = -flyInfo.R * Math.cos(angle)
+    const z = -flyInfo.R * Math.sin(angle)
+    fly.position.x = x
+    fly.position.z = z
+    // 保持无人机镜头一直对准旋转中心
+    const b = target.clone().sub(fly.position).normalize()
+    // 计算当前位置相对初始位置需要旋转的角度
+    const q = new THREE.Quaternion()
+    q.setFromUnitVectors(a, b) // a到b向量旋转的角度
+    const newQ = q0.clone().multiply(q)
+    fly.quaternion.copy(newQ)
+    // 旋转相机
+    const cx = -(flyInfo.R + 20) * Math.cos(angle)
+    const cy = flyInfo.H + 10
+    const cz = -(flyInfo.R + 30) * Math.sin(angle)
+    camera.position.set(cx, cy, cz)
+    // 更新相机的朝向
+    controls.target.set(0, 0, 0)
+    controls.update() // 内部会执行.lookAt()，相当于执行相机的lookAt
+  }
+}
+
+// 模拟场景中下雨或者下雪的效果
+const initRainOrSnow = (texture: THREE.Texture) => {
+  const spriteMaterial = new THREE.SpriteMaterial({
+    map: texture
+  })
+  spriteGroup = new THREE.Group()
+  scene!.add(spriteGroup)
+  for (let i = 0; i < N; i++) {
+    const sprite = new THREE.Sprite(spriteMaterial)
+    spriteGroup.add(sprite)
+    // 设置精灵模型位置，在长方体空间中随机分布
+    const x = 1000 * (Math.random() - 0.5)
+    const y = 600 * Math.random()
+    const z = 1000 * (Math.random() - 0.5)
+    sprite.position.set(x, y, z)
   }
 }
 
@@ -392,6 +533,7 @@ onUnmounted(() => {
   scene = null
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
+  cancelAnimationFrame(flyTimer.value)
 })
 </script>
 
