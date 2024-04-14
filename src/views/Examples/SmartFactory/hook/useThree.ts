@@ -1,13 +1,17 @@
+import * as THREE from 'three'
 // 导入hooks
-import { useScene } from '@/hooks/useScene'
-import { useAxesHelper } from '@/hooks/useAxesHelper'
-import { useHdr } from '@/hooks/useHdr'
-import { useFog } from '@/hooks/useFog'
-import { useLights } from '@/hooks/useLights'
-import { useCamera } from '@/hooks/useCamera'
-import { useStatus } from '@/hooks/useStatus'
-import { useRenderer } from '@/hooks/useRenderer'
-import { useControls } from '@/hooks/useControls'
+import {
+  useScene,
+  useAxesHelper,
+  useHdr,
+  useFog,
+  useLights,
+  useCamera,
+  useStatus,
+  useRenderer,
+  useCSS2DRenderer,
+  useControls
+} from '@/hooks'
 
 export const useThree = () => {
   const { initScene } = useScene()
@@ -19,6 +23,12 @@ export const useThree = () => {
   const { initStatus } = useStatus()
   const { initRender } = useRenderer()
   const { initControls } = useControls()
+  const { initCSS2DRender } = useCSS2DRenderer()
+
+  // 相机的位置坐标
+  const cameraPos = new THREE.Vector3(202, 123, 125)
+  // 相机的朝向
+  const controlsTarget = new THREE.Vector3(0, 0, 0)
 
   const initThree = (canvas: HTMLCanvasElement) => {
     // 2.1.创建场景
@@ -57,8 +67,19 @@ export const useThree = () => {
     // 最大仰角
     controls.minPolarAngle = 0
     controls.maxPolarAngle = Math.PI / 2
+    // 2.10.创建css2D渲染器
+    const css2Renderer = initCSS2DRender()
 
-    return { scene, camera, renderer, controls, status }
+    return {
+      scene,
+      camera,
+      renderer,
+      controls,
+      status,
+      css2Renderer,
+      cameraPos,
+      controlsTarget
+    }
   }
 
   return {

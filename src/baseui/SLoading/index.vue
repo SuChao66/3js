@@ -13,21 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs, watch } from 'vue'
+import { toRefs } from 'vue'
 import type { IProps } from './types'
 
 const props = withDefaults(defineProps<IProps>(), {
   currentProgress: 0
 })
 const { currentProgress } = toRefs(props)
-
-watch(
-  () => currentProgress,
-  (val) => {
-    console.log(val.value)
-  },
-  { immediate: true }
-)
 </script>
 
 <style lang="less" scoped>
