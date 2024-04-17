@@ -7,3 +7,7 @@ interface ICunChuInfo {
 export interface ICunChu {
   [key: string]: ICunChuInfo
 }
+
+export interface IKeyStates {
+  [key: string]: boolean
+}

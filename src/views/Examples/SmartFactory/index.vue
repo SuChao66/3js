@@ -13,6 +13,9 @@
       <el-button size="large" plain round @click="handleFly">
         {{ isFlyPlaying ? '退出巡厂' : '无人机巡场' }}
       </el-button>
+      <el-button size="large" plain round @click="handleRoaming">
+        {{ isRoaming ? '退出漫游' : '宇宙漫游' }}
+      </el-button>
     </div>
     <!-- 标签 -->
     <div id="tag" style="display: none">
@@ -55,8 +58,11 @@ import { useThree } from './hook/useThree.ts'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STag from './components/STag/index.vue'
+import { ElMessage } from 'element-plus'
 // 导入配置文件
 import { cunchuInfo } from './constants'
+// 导入配置文件
+import type { IKeyStates } from './types'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -80,19 +86,27 @@ const timer = ref<number>(0)
 const flyTimer = ref<number>(0)
 // 是否正在无人机巡厂
 const isFlyPlaying = ref<boolean>(false)
+// 是否开启宇宙漫游
+const isRoaming = ref<boolean>(false)
 // three变量
 let scene: THREE.Scene | null, // 场景
-  model: THREE.Group, // 工厂模型
-  fly: THREE.Group, // 无人机模型
+  model: THREE.Group | null = new THREE.Group(), // 模型集合
+  factory: THREE.Group, // 工厂模型
+  fly: THREE.Group | null, // 无人机模型
+  player: THREE.Group | null, // 人模型
   camera: THREE.PerspectiveCamera, // 相机
+  cameraGroup: THREE.Group = new THREE.Group(), // 相机组
   renderer: THREE.WebGLRenderer, // 渲染器
   css2Renderer: CSS2DRenderer, // 标签渲染器
   status: Status, // 性能监视器
   controls: OrbitControls, // 相机控制器
   mixer: THREE.AnimationMixer, // 动画播放器（卡车）
   planeMixer: THREE.AnimationMixer, // 动画播放器（无人机）
-  clipAction: THREE.AnimationAction, /// 卡车动画
-  planeClipAction: THREE.AnimationAction, /// 无人机动画
+  playerMixer: THREE.AnimationMixer, // 动画播放器（玩家）
+  clipAction: THREE.AnimationAction, // 卡车动画
+  planeClipAction: THREE.AnimationAction, // 无人机动画
+  idleClipAction: THREE.AnimationAction, // 休息
+  walkClipAction: THREE.AnimationAction, // 走路
   spriteGroup: THREE.Group, // 精灵模型
   selectModel: THREE.Object3D, // 选择的模型
   cameraPos: THREE.Vector3, // 相机初始位置
@@ -108,6 +122,31 @@ const flyInfo = {
 }
 // 无人机的停放位置
 const flyPosition = new THREE.Vector3(-25, 0, 10)
+// 玩家的位置
+const playerPosition = new THREE.Vector3(-15, 0, 30)
+const keyStates: IKeyStates = {
+  // 使用W、A、S、D按键来控制前、后、左、右运动
+  // false表示没有按下，true表示按下状态
+  W: false,
+  A: false,
+  S: false,
+  D: false
+}
+// 定义玩家漫游的速度
+const v = new THREE.Vector3(0, 0, 0)
+// 玩家最大速度
+const vMax = 5.5
+// 玩家加速度
+const a = 12
+// 定义地面摩擦力系数（阻尼系数）
+const damping = -0.06
+// 第三人称视角相机位置
+const thirdCameraPosition = new THREE.Vector3(0, 1.6, 7.5)
+// 俯仰角度范围
+const angleMin = THREE.MathUtils.degToRad(-15)
+const angleMax = THREE.MathUtils.degToRad(15)
+// true表示第三人称，false表示第一人称
+const viewBool = ref<boolean>(true)
 
 const { initThree } = useThree()
 
@@ -130,6 +169,8 @@ onMounted(() => {
   css2Renderer = mCss2Renderer
   cameraPos = mCameraPos
   controlsTarget = mControlsTarget
+  // 将相机添加到cameraGroup中
+  cameraGroup.add(camera)
   // 添加性能监视器
   statusRef.value?.appendChild(mStatus.dom)
   // 添加css2DRenderer
@@ -151,9 +192,8 @@ const initModel = () => {
     './models/factory.glb',
     (gltf) => {
       // 保存模型
-      model = gltf.scene
-      // 往场景中添加模型
-      scene!.add(gltf.scene)
+      factory = gltf.scene
+      model!.add(factory)
       // 播放关键帧动画
       mixer = new THREE.AnimationMixer(gltf.scene)
       // 获取gltf.animations[0]的第一个clip动画对象
@@ -170,6 +210,8 @@ const initModel = () => {
       if (currentProgress.value === 100) {
         // 加载无人机模型
         initPlaneModel()
+        // 加载人模型
+        initHumanModel()
         setTimeout(() => {
           isLoading.value = false
         }, 1000)
@@ -182,16 +224,53 @@ const initModel = () => {
 const initPlaneModel = () => {
   const loader = new GLTFLoader()
   loader.load('./models/plane.glb', (gltf) => {
-    fly = new THREE.Group()
+    fly = gltf.scene
     fly.scale.set(0.25, 0.25, 0.25)
-    fly.position.set(-25, 0, 10)
-    fly.add(gltf.scene)
-    scene!.add(fly)
+    fly.position.set(-25, 0.5, 10)
+    model!.add(fly)
     // 播放无人机动画
     planeMixer = new THREE.AnimationMixer(gltf.scene)
     // 获取gltf.animations[0]的第一个clip动画对象
     planeClipAction = planeMixer.clipAction(gltf.animations[0])
   })
+}
+
+// 加载人模型
+const initHumanModel = () => {
+  const loader = new GLTFLoader()
+  loader.load('./models/soldiers.glb', (gltf) => {
+    // 保存玩家模型
+    player = gltf.scene
+    // 添加至场景中
+    model!.add(player)
+    // 设置玩家的大小和位置
+    player.scale.set(2, 2, 2)
+    player.position.copy(playerPosition)
+    scene!.add(model!)
+    // 获取人的关键帧动画
+    const animations = gltf.animations
+    // 创建玩家动画播放器
+    playerMixer = new THREE.AnimationMixer(gltf.scene)
+    // 创建动画对象
+    idleClipAction = playerMixer.clipAction(animations[0])
+    walkClipAction = playerMixer.clipAction(animations[3])
+    // 播放动画
+    idleClipAction.play()
+    walkClipAction.play()
+    // 通过权重来设置动画
+    idleClipAction.weight = 1.0
+    walkClipAction.weight = 0.0
+  })
+}
+
+const changeAction = (name: string) => {
+  if (name === 'idle') {
+    idleClipAction.weight = 1.0
+    walkClipAction.weight = 0.0
+  } else if (name === 'walk') {
+    idleClipAction!.weight = 0.0
+    walkClipAction!.weight = 1.0
+  }
 }
 
 // 渲染
@@ -208,11 +287,15 @@ const animate = () => {
   // 更新性能监视器
   status && status.update()
   // 更新相机控制器
-  controls && controls.update()
+  if (!isRoaming.value) {
+    controls && controls.update()
+  }
   // 更新卡车动画时间
   mixer && mixer.update(delta)
   // 更新无人机动画时间
   planeMixer && planeMixer.update(delta)
+  // 更新玩家动画
+  playerMixer && playerMixer.update(delta)
   // 更新TWEEN
   TWEEN.update()
   // 更新雨滴的位置
@@ -228,6 +311,62 @@ const animate = () => {
         sprite.position.y = 600
       }
     })
+  }
+  // 玩家宇宙漫游
+  // 通过速度大小，设置相应的动画
+  if (isRoaming.value) {
+    const vl = v.length()
+    if (vl < 0.2) {
+      changeAction('idle')
+    } else {
+      changeAction('walk')
+    }
+    console.log('速度大小', v.length())
+    if (Math.floor(v.length()) <= vMax) {
+      // 加速前进
+      if (keyStates.W) {
+        // 假设w键对应的运动方向为z的负半轴
+        // const front = new THREE.Vector3(0, 0, -1);
+        let front = new THREE.Vector3()
+        player!.getWorldDirection(front) // 默认方向与z轴正方向平行
+        // 由于模型的初始方向是沿着z轴负方向的，所以此处获取的方向需要取反
+        front.multiplyScalar(-1)
+        // delta时间短内，速度的变化量，v = v0 + at
+        // 初始速度 + 速度的变化量
+        v.add(front.multiplyScalar(a * delta))
+      } else if (keyStates.S) {
+        // 后退
+        // 假设S键对应的运动方向为z的正半轴(S按键和W方向相反)
+        // const front = new THREE.Vector3(0, 0, 1);
+        const front = new THREE.Vector3()
+        player!.getWorldDirection(front)
+        // delta时间短内，速度的变化量，v = v0 + at
+        // 初始速度 + 速度的变化量
+        v.add(front.multiplyScalar(a * delta))
+      } else if (keyStates.A) {
+        // 往左
+        const front = new THREE.Vector3() // 前方
+        player!.getWorldDirection(front)
+        const up = new THREE.Vector3(0, 1, 0) // 上方向
+        const left = front.cross(up)
+        v.add(left.multiplyScalar(a * delta))
+      } else if (keyStates.D) {
+        // 往右
+        const front = new THREE.Vector3() // 前方
+        player!.getWorldDirection(front)
+        const up = new THREE.Vector3(0, 1, 0) // 上方向
+        const right = up.cross(front)
+        v.add(right.multiplyScalar(a * delta))
+      }
+      // 阻尼设置
+      // v = v * (1-0.04) = v * (1 + damping) = v + v * damping
+      // .addScaledVector(v, s)：将所传入的v与s相乘所得的乘积和这个向量相加。
+      v.addScaledVector(v, damping)
+      // delta时间段内位置改变量
+      const deltaPos = v.clone().multiplyScalar(delta)
+      // 原位置加上改变的位移量
+      player && player!.position.add(deltaPos)
+    }
   }
 }
 
@@ -259,7 +398,7 @@ const restoryfFly = () => {
   cancelAnimationFrame(flyTimer.value)
   // 获取无人机的位置
   const flyWorldPosition = new THREE.Vector3()
-  fly.getWorldPosition(flyWorldPosition)
+  fly!.getWorldPosition(flyWorldPosition)
   // 设置无人机停放的位置
   new TWEEN.Tween({
     x: flyWorldPosition.x,
@@ -272,9 +411,9 @@ const restoryfFly = () => {
       z: flyPosition.z
     })
     .onUpdate((obj) => {
-      fly.position.x = obj.x
-      fly.position.y = obj.y
-      fly.position.z = obj.z
+      fly!.position.x = obj.x
+      fly!.position.y = obj.y
+      fly!.position.z = obj.z
     })
     .onComplete(() => {
       // 恢复完整视角
@@ -294,20 +433,20 @@ const executeFly = () => {
   new TWEEN.Tween({ x: -25, y: 0 })
     .to({ x: -flyInfo.R, y: flyInfo.H }, 5000)
     .onUpdate((obj) => {
-      fly.position.x = obj.x
-      fly.position.y = obj.y
+      fly!.position.x = obj.x
+      fly!.position.y = obj.y
       // 保持无人机镜头一直对准旋转中心
-      const b = target.clone().sub(fly.position).normalize()
+      const b = target.clone().sub(fly!.position).normalize()
       // 计算当前位置相对初始位置需要旋转的角度
       const q = new THREE.Quaternion()
       q.setFromUnitVectors(a, b) // a到b向量旋转的角度
       const newQ = q0.clone().multiply(q)
-      fly.quaternion.copy(newQ)
+      fly!.quaternion.copy(newQ)
     })
     .onComplete(() => {
       // 获取无人机的世界坐标
       const flyWorldPosition = new THREE.Vector3()
-      fly.getWorldPosition(flyWorldPosition)
+      fly!.getWorldPosition(flyWorldPosition)
       // 计算相机的位置
       const endPositionX = flyWorldPosition.clone().x - 10
       const endPositionY = flyWorldPosition.clone().y + 2
@@ -330,7 +469,7 @@ const executeFly = () => {
   // 绕转中心的坐标
   const target = new THREE.Vector3(0, flyInfo.H, 0)
   // 无人机姿态角度初始值
-  const q0 = fly.quaternion.clone()
+  const q0 = fly!.quaternion.clone()
   // 定义开始角度
   let angle = 0
   function loop() {
@@ -339,15 +478,15 @@ const executeFly = () => {
     // 无人机y坐标不变，在平行于X0Z的平面上做圆周运动
     const x = -flyInfo.R * Math.cos(angle)
     const z = -flyInfo.R * Math.sin(angle)
-    fly.position.x = x
-    fly.position.z = z
+    fly!.position.x = x
+    fly!.position.z = z
     // 保持无人机镜头一直对准旋转中心
-    const b = target.clone().sub(fly.position).normalize()
+    const b = target.clone().sub(fly!.position).normalize()
     // 计算当前位置相对初始位置需要旋转的角度
     const q = new THREE.Quaternion()
     q.setFromUnitVectors(a, b) // a到b向量旋转的角度
     const newQ = q0.clone().multiply(q)
-    fly.quaternion.copy(newQ)
+    fly!.quaternion.copy(newQ)
     // 旋转相机
     const cx = -(flyInfo.R + 20) * Math.cos(angle)
     const cy = flyInfo.H + 10
@@ -356,6 +495,34 @@ const executeFly = () => {
     // 更新相机的朝向
     controls.target.set(0, 0, 0)
     controls.update() // 内部会执行.lookAt()，相当于执行相机的lookAt
+  }
+}
+
+// 宇宙漫游
+const handleRoaming = () => {
+  if (isRoaming.value) {
+    isRoaming.value = false
+    // 退出漫游，将相机移至初始位置
+    player?.remove(cameraGroup)
+    // 恢复完整视角
+    createCameraTween(cameraPos, controlsTarget)
+  } else {
+    ElMessage({
+      message: '当前为第三人称宇宙漫游，键盘V可切换至第一人称模式',
+      type: 'success',
+      plain: true
+    })
+    // 打开漫游
+    isRoaming.value = true
+    // 将相机添加到玩家的模型中
+    player?.add(cameraGroup)
+    // 获取玩家的位置
+    const playerWorldPosition = new THREE.Vector3()
+    player?.getWorldPosition(playerWorldPosition)
+    // 将相机移动的合适的位置（默认第三人称）
+    createCameraTween(thirdCameraPosition, playerWorldPosition)
+    // 进入指针锁定模式
+    document.body.requestPointerLock()
   }
 }
 
@@ -432,7 +599,7 @@ const handlePointerClick = (e: Event) => {
   // 形象点说就是在点击位置创建一条射线，射线穿过的模型代表选中
   raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
   // 获取存储罐模型
-  const cunchu = model.getObjectByName('存储罐')
+  const cunchu = factory.getObjectByName('存储罐')
   for (let i = 0; i < cunchu!.children.length; i++) {
     const group = cunchu?.children[i]
     group?.traverse((obj: any) => {
@@ -494,6 +661,49 @@ const handleClose = () => {
   }
 }
 
+// 鼠标按下事件，宇宙漫游
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyW') keyStates.W = true
+  if (event.code === 'KeyA') keyStates.A = true
+  if (event.code === 'KeyS') keyStates.S = true
+  if (event.code === 'KeyD') keyStates.D = true
+  // 第一人称和第三人称切换
+  if (event.code === 'KeyV') {
+    if (viewBool.value) {
+      camera.position.z = 7.5
+    } else {
+      camera.position.z = -0.5
+    }
+    viewBool.value = !viewBool.value
+  }
+})
+
+document.addEventListener('keyup', (event) => {
+  if (event.code === 'KeyW') keyStates.W = false
+  if (event.code === 'KeyA') keyStates.A = false
+  if (event.code === 'KeyS') keyStates.S = false
+  if (event.code === 'KeyD') keyStates.D = false
+})
+
+// 鼠标移动事件
+document.addEventListener('mousemove', (event) => {
+  if (document.pointerLockElement === document.body) {
+    // 左右旋转
+    if (player) {
+      player!.rotation.y -= event.movementX / 600
+    }
+    // 上下旋转,视角上下俯仰，修改玩家角色的子对象cameraGroup
+    // 如果修改的是玩家的角度，玩家在视角上会与地面平行
+    cameraGroup.rotation.x -= event.movementY / 600
+    if (cameraGroup.rotation.x < angleMin) {
+      cameraGroup.rotation.x = angleMin
+    }
+    if (cameraGroup.rotation.x > angleMax) {
+      cameraGroup.rotation.x = angleMax
+    }
+  }
+})
+
 // 创建相机动画
 const createCameraTween = (endPos: THREE.Vector3, endTarget: THREE.Vector3) => {
   useCameraTween(camera.position, controls.target, endPos, endTarget)
@@ -531,6 +741,9 @@ onUnmounted(() => {
     }
   })
   scene = null
+  fly = null
+  player = null
+  model = null
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
   cancelAnimationFrame(flyTimer.value)

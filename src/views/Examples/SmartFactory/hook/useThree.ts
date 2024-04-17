@@ -34,7 +34,7 @@ export const useThree = () => {
     // 2.1.创建场景
     const scene = initScene()
     // 2.2.辅助观察坐标系
-    // const axesHelper = initHelper()
+    const axesHelper = initHelper()
     // scene.add(axesHelper)
     // 2.3.设置天空盒
     initHDR('./hdr/sky1.hdr').then((texture: any) => {
@@ -63,7 +63,7 @@ export const useThree = () => {
     controls.enableZoom = true
     // 内外移动距离
     controls.maxDistance = 400
-    controls.minDistance = 100
+    controls.minDistance = 0
     // 最大仰角
     controls.minPolarAngle = 0
     controls.maxPolarAngle = Math.PI / 2
