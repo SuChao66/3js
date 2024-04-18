@@ -202,8 +202,6 @@ const initModel = () => {
       clipAction.play()
       // 暂停状态
       clipAction.paused = true
-      // 默认下雨效果
-      handleEnvironment('rain')
     },
     (xhr) => {
       currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
@@ -260,6 +258,8 @@ const initHumanModel = () => {
     // 通过权重来设置动画
     idleClipAction.weight = 1.0
     walkClipAction.weight = 0.0
+    // 默认下雨效果
+    handleEnvironment('rain')
   })
 }
 
