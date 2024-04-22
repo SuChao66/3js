@@ -40,6 +40,8 @@ import Status from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入GLTF加载器
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+// 导入draco解压器
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 // 导入CSS2D
 import {
   CSS2DObject,
@@ -187,7 +189,10 @@ onMounted(() => {
 
 // 加载模型
 const initModel = () => {
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('./draco/')
   const loader = new GLTFLoader()
+  loader.setDRACOLoader(dracoLoader)
   loader.load(
     './models/factory.glb',
     (gltf) => {
@@ -220,7 +225,10 @@ const initModel = () => {
 
 // 加载无人机
 const initPlaneModel = () => {
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('./draco/')
   const loader = new GLTFLoader()
+  loader.setDRACOLoader(dracoLoader)
   loader.load('./models/plane.glb', (gltf) => {
     fly = gltf.scene
     fly.scale.set(0.25, 0.25, 0.25)
@@ -235,7 +243,10 @@ const initPlaneModel = () => {
 
 // 加载人模型
 const initHumanModel = () => {
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('./draco/')
   const loader = new GLTFLoader()
+  loader.setDRACOLoader(dracoLoader)
   loader.load('./models/soldiers.glb', (gltf) => {
     // 保存玩家模型
     player = gltf.scene

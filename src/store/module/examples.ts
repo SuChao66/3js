@@ -18,8 +18,8 @@ const useExampleStore = defineStore('examples', () => {
       key: 2,
       title: '数字孪生-收费站',
       img: smartFactorySmall,
-      desc: '可实时查看高速收费站记录',
-      path: 'SmartFactory'
+      desc: '实时检测高速车流量',
+      path: 'SmartTollBooths'
     },
     {
       key: 3,

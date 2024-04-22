@@ -35,6 +35,18 @@ const images = [
   {
     url: smartFactory,
     path: 'SmartFactory'
+  },
+  {
+    url: smartFactory,
+    path: 'SmartFactory'
+  },
+  {
+    url: smartFactory,
+    path: 'SmartFactory'
+  },
+  {
+    url: smartFactory,
+    path: 'SmartFactory'
   }
 ]
 
