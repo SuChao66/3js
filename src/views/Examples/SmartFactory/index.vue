@@ -1,21 +1,16 @@
 <template>
   <div class="smart-factory">
+    <!-- 交互控制 -->
     <div class="btn-operation" v-if="!isLoading">
-      <el-button size="large" plain round @click="handlePlay">
-        {{ isPlaying ? '暂停' : '播放' }}
-      </el-button>
-      <el-button size="large" plain round @click="handleEnvironment('rain')">
-        下雨
-      </el-button>
-      <el-button size="large" plain round @click="handleEnvironment('snow')">
-        下雪
-      </el-button>
-      <el-button size="large" plain round @click="handleFly">
-        {{ isFlyPlaying ? '退出巡厂' : '无人机巡场' }}
-      </el-button>
-      <el-button size="large" plain round @click="handleRoaming">
-        {{ isRoaming ? '退出漫游' : '宇宙漫游' }}
-      </el-button>
+      <SControls
+        :isPlaying="isPlaying"
+        :isFlyPlaying="isFlyPlaying"
+        :isRoaming="isRoaming"
+        @handlePlay="handlePlay"
+        @handleEnvironment="handleEnvironment"
+        @handleFly="handleFly"
+        @handleRoaming="handleRoaming"
+      />
     </div>
     <!-- 标签 -->
     <div id="tag" style="display: none">
@@ -58,7 +53,10 @@ import { useThree } from './hook/useThree.ts'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STag from './components/STag/index.vue'
+import SControls from './components/SControls/index.vue'
 import { ElMessage } from 'element-plus'
+// 导入hook
+import { useStatusByEnv } from '@/hooks'
 // 导入配置文件
 import { cunchuInfo } from './constants'
 // 导入配置文件
@@ -172,7 +170,9 @@ onMounted(() => {
   // 将相机添加到cameraGroup中
   cameraGroup.add(camera)
   // 添加性能监视器
-  statusRef.value?.appendChild(mStatus.dom)
+  if (useStatusByEnv()) {
+    statusRef.value?.appendChild(mStatus.dom)
+  }
   // 添加css2DRenderer
   tagRef.value?.appendChild(css2Renderer.domElement)
   // 注册鼠标点击事件

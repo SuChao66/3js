@@ -4,11 +4,12 @@
       <el-carousel-item v-for="item in images" :key="item">
         <el-image
           style="width: 100%; height: 100%"
-          :src="item"
+          :src="item.url"
           :zoom-rate="1.2"
           :max-scale="7"
           :min-scale="0.2"
           fit="cover"
+          @click="handleImgClick(item.path)"
         />
       </el-carousel-item>
     </el-carousel>
@@ -16,14 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import room from '@/assets/images/room.jpeg'
-import bigScreen from '@/assets/images/big-screen.jpeg'
-import human from '@/assets/images/3d-human.png'
-import internetOfThings from '@/assets/images/3d-lianwang.jpeg'
-import mall from '@/assets/images/3d-mall.jpg'
-import park from '@/assets/images/3d-park.png'
+import smartFactory from '@/assets/images/smart-factory.png'
 // 导入类型
 import type { IProps } from './types'
+// 导入路由
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // 0.定义props
 const props = withDefaults(defineProps<IProps>(), {
@@ -31,7 +31,18 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 const { height } = toRefs(props)
 
-const images = [room, bigScreen, human, internetOfThings, mall, park]
+const images = [
+  {
+    url: smartFactory,
+    path: 'SmartFactory'
+  }
+]
+
+const handleImgClick = (path: string) => {
+  router.push({
+    name: path
+  })
+}
 </script>
 
 <style lang="less" scoped>

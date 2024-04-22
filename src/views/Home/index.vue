@@ -6,15 +6,26 @@
         <!-- 轮播图 -->
         <Swiper />
         <!-- threejs案例 -->
-        <STitle title="作品集" />
+        <STitle title="数字孪生" />
         <div class="example-list" v-if="isRender">
           <SCard
-            v-for="item in exmaples.exampleList"
+            v-for="item in exmaples.digitalTwinsExamples"
             :key="item.key"
             :card="item"
             :column="column"
           />
         </div>
+        <!-- <STitle title="元宇宙" />
+        <div class="example-list" v-if="isRender">
+          <SCard
+            v-for="item in exmaples.metaverseExamples"
+            :key="item.key"
+            :card="item"
+            :column="column"
+          />
+        </div>
+        <STitle title="3D可视化大屏" />
+        <STitle title="3D全景可视化" /> -->
       </el-main>
     </el-container>
   </div>

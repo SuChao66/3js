@@ -17,3 +17,4 @@ export * from './effectPass/useGammaPass'
 // 公共hook
 export * from './common/useWindowSize'
 export * from './common/useCameraTween'
+export * from './common/useStatusByEnv'
