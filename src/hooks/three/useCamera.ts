@@ -9,13 +9,19 @@ export const useCamera = () => {
    * @param position
    * @param lookAt
    */
-  const initPerspectiveCamera = (
-    fov: number = 30,
-    near: number = 1,
-    far: number = 3000,
-    position: THREE.Vector3 = new THREE.Vector3(202, 123, 125),
-    lookAt: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
-  ) => {
+  const initPerspectiveCamera = ({
+    fov = 30,
+    near = 1,
+    far = 3000,
+    position = new THREE.Vector3(0, 0, 0),
+    lookAt = new THREE.Vector3(0, 0, 0)
+  }: {
+    fov?: number
+    near?: number
+    far?: number
+    position?: THREE.Vector3
+    lookAt?: THREE.Vector3
+  }) => {
     const width = window.innerWidth
     const height = window.innerHeight
     const camera = new THREE.PerspectiveCamera(fov, width / height, near, far)

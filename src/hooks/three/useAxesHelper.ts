@@ -1,15 +1,16 @@
 import * as THREE from 'three'
 
-export const useAxesHelper = () => {
-  /**
-   * 初始化观察坐标系
-   * @param size 大小
-   */
-  const initHelper = (size: number = 50) => {
-    return new THREE.AxesHelper(size)
-  }
-
-  return {
-    initHelper
-  }
+/**
+ * 创建坐标辅助器
+ * @param param0
+ */
+export const useAxesHelper = ({
+  size = 50,
+  scene
+}: {
+  size?: number
+  scene: THREE.Scene
+}) => {
+  const axesHelper = new THREE.AxesHelper(size)
+  scene.add(axesHelper)
 }

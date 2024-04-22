@@ -2,19 +2,18 @@ import * as THREE from 'three'
 // 导入hooks
 import {
   useScene,
-  useAxesHelper,
-  useHdr,
+  usePanorama,
   useFog,
   useLights,
+  useEnvironmentTexture,
   useCamera,
   useStatus,
   useRenderer,
-  useCSS2DRenderer,
   useControls
 } from '@/hooks'
 
 export const useThree = () => {
-  const { initFogExp2 } = useFog()
+  const { initFog } = useFog()
   const { initAmbientLight, initDirectionalLight } = useLights()
   const { initPerspectiveCamera } = useCamera()
   const { initControls } = useControls()
@@ -27,18 +26,25 @@ export const useThree = () => {
   const initThree = (canvas: HTMLCanvasElement) => {
     // 2.1.创建场景
     const scene = useScene()
-    // 2.2.辅助观察坐标系
-    useAxesHelper({ scene })
-    // 2.3.设置天空盒
-    useHdr({ path: './hdr/sky1.hdr', scene })
-    // 2.4.创建雾化效果
-    initFogExp2({ scene })
-    // 2.5.设置光源
+    initFog({
+      near: -100,
+      far: 2000,
+      scene
+    })
+    // 2.2.设置天空盒
+    usePanorama({ scene, path: './images/全景2048.jpg' })
+    // 2.3.设置环境贴图
+    const textureCube = useEnvironmentTexture({ path: './环境贴图/环境贴图1/' })
+    // 2.4.设置光源
     initAmbientLight({ scene })
-    initDirectionalLight({ scene, position: new THREE.Vector3(100, 60, 50) })
+    initDirectionalLight({
+      scene,
+      isShowHelper: true,
+      position: new THREE.Vector3(50, 50, 50)
+    })
     // 2.6.创建相机
     const camera = initPerspectiveCamera({
-      position: new THREE.Vector3(202, 123, 125)
+      position: new THREE.Vector3(31.68, 12.51, 79.55)
     })
     // 2.7.创建渲染器
     const renderer = useRenderer(canvas)
@@ -51,13 +57,11 @@ export const useThree = () => {
     controls.enablePan = false
     controls.enableZoom = true
     // 内外移动距离
-    controls.maxDistance = 400
-    controls.minDistance = 0
+    controls.maxDistance = 200
+    controls.minDistance = 50
     // 最大仰角
     controls.minPolarAngle = 0
-    controls.maxPolarAngle = Math.PI / 2
-    // 2.10.创建css2D渲染器
-    const css2Renderer = useCSS2DRenderer()
+    controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
 
     return {
       scene,
@@ -65,9 +69,9 @@ export const useThree = () => {
       renderer,
       controls,
       status,
-      css2Renderer,
       cameraPos,
-      controlsTarget
+      controlsTarget,
+      textureCube
     }
   }
 

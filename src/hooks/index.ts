@@ -10,6 +10,8 @@ export * from './three/useCSS2DRenderer'
 export * from './three/useScene'
 export * from './three/useStatus'
 export * from './three/usePointer'
+export * from './three/usePanorama'
+export * from './three/useEnvironmentTexture'
 // three后处理hook
 export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'

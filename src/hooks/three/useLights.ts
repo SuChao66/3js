@@ -5,31 +5,51 @@ export const useLights = () => {
    * 创建环境光
    * @param color 颜色
    * @param density 强度
-   * @returns
+   * @param scene 场景
    */
-  const initAmbientLight = (density: number = 0.4) => {
+  const initAmbientLight = ({
+    density = 0.4,
+    scene
+  }: {
+    density?: number
+    scene: THREE.Scene
+  }) => {
     const ambient = new THREE.AmbientLight(0xffffff, density)
-    return ambient
+    scene.add(ambient)
   }
 
   /**
    * 创建平行光
    * @param color 颜色
    * @param density 强度
-   * @param direction 方向
-   * @returns
+   * @param position 位置
+   * @param isShowHelper 是否显示光源辅助器
+   * @param scene 场景
    */
-  const initDirectionalLight = (
-    color: number = 0xffffff,
-    density: number = 1,
-    direction: number[] = [100, 60, 50]
-  ) => {
+  const initDirectionalLight = ({
+    color = 0xffffff,
+    density = 1,
+    position = new THREE.Vector3(0, 0, 0),
+    isShowHelper = false,
+    scene
+  }: {
+    color?: number
+    density?: number
+    position?: THREE.Vector3
+    isShowHelper?: boolean
+    scene: THREE.Scene
+  }) => {
     const directionalLight = new THREE.DirectionalLight(color, density)
-    const x = direction[0]
-    const y = direction[1]
-    const z = direction[2]
-    directionalLight.position.set(x, y, z)
-    return directionalLight
+    directionalLight.position.copy(position)
+    if (isShowHelper) {
+      const helper = new THREE.DirectionalLightHelper(
+        directionalLight,
+        5,
+        0xff0000
+      )
+      scene.add(helper)
+    }
+    scene.add(directionalLight)
   }
 
   /**
@@ -38,14 +58,38 @@ export const useLights = () => {
    * @param density 强度
    * @param distance 距离
    * @param decay 衰减程度
+   * @param position 点光源位置
+   * @param isShowHelper 是否显示光源辅助器
+   * @param scene 场景
    */
-  const initPointLight = (
-    color: number = 0xffffff,
-    density: number = 1,
-    distance: number = 100,
-    decay: number = 2
-  ) => {
-    new THREE.PointLight(color, density, distance, decay)
+  const initPointLight = ({
+    color = 0xffffff,
+    density = 1,
+    distance = 100,
+    decay = 2,
+    position = new THREE.Vector3(0, 0, 0),
+    isShowHelper = false,
+    scene
+  }: {
+    color?: number
+    density?: number
+    distance?: number
+    decay?: number
+    position?: THREE.Vector3
+    isShowHelper?: boolean
+    scene: THREE.Scene
+  }) => {
+    const pointLight = new THREE.PointLight(color, density, distance, decay)
+    pointLight.position.copy(position)
+    if (isShowHelper) {
+      const pointLightHelper = new THREE.PointLightHelper(
+        pointLight,
+        1,
+        0xffff00
+      )
+      scene.add(pointLightHelper)
+    }
+    scene.add(pointLight)
   }
 
   return {

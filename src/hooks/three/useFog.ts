@@ -6,13 +6,19 @@ export const useFog = () => {
    * @param color
    * @param density
    */
-  const initFog = (
-    color: number = 0xffffff,
-    near: number = 1,
-    far: number = 1000
-  ) => {
+  const initFog = ({
+    color = 0xffffff,
+    near = 1,
+    far = 1000,
+    scene
+  }: {
+    color?: number
+    near?: number
+    far?: number
+    scene: THREE.Scene
+  }) => {
     const fog = new THREE.Fog(color, near, far)
-    return fog
+    scene.fog = fog
   }
 
   /**
@@ -21,9 +27,17 @@ export const useFog = () => {
    * @param density
    * @returns
    */
-  const initFogExp2 = (color: number = 0xffffff, density: number = 0.0025) => {
+  const initFogExp2 = ({
+    color = 0xffffff,
+    density = 0.0025,
+    scene
+  }: {
+    color?: number
+    density?: number
+    scene: THREE.Scene
+  }) => {
     const fog = new THREE.FogExp2(color, density)
-    return fog
+    scene.fog = fog
   }
 
   return {

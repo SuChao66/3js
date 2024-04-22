@@ -9,10 +9,13 @@ export const useControls = () => {
    * @param camera
    * @param renderer
    */
-  const initControls = (
-    camera: THREE.PerspectiveCamera,
+  const initControls = ({
+    camera,
+    renderer
+  }: {
+    camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
-  ) => {
+  }) => {
     const controls = new OrbitControls(camera!, renderer!.domElement)
     controls.target.set(0, 0, 0)
 
