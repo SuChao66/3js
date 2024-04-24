@@ -10,7 +10,11 @@ import {
   useCSS2DRenderer,
   useCSS3DRenderer,
   useControls,
-  useHdr
+  useHdr,
+  useEffectComposer,
+  useGammaPass,
+  useFxaaComposer,
+  useOutlinePass
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -65,8 +69,17 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.update()
   // 1.9.创建css3d渲染器
   const css3Drenderer = useCSS3DRenderer()
-  // 2.0.创建css2d渲染器
+  // 1.10.创建css2d渲染器
   const css2Drenderer = useCSS2DRenderer()
+  // 1.11.创建后期效果器
+  const { composer } = useEffectComposer(renderer, scene, camera)
+  const { outlinePass } = useOutlinePass(scene, camera)
+  const { FXAA } = useFxaaComposer()
+  const { gammaPass } = useGammaPass()
+  // 设置OutlinePass通道
+  composer.addPass(outlinePass)
+  composer.addPass(FXAA)
+  composer.addPass(gammaPass)
 
   return {
     scene,
@@ -75,6 +88,8 @@ export const useThree = (canvas: HTMLCanvasElement) => {
     css3Drenderer,
     css2Drenderer,
     controls,
-    status
+    status,
+    composer,
+    outlinePass
   }
 }

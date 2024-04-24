@@ -33,6 +33,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 // 导入CSS3DRenderer
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
+// 后处理
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass'
 // 导入动画库
 import * as TWEEN from '@tweenjs/tween.js'
 // 导入hooks
@@ -77,7 +80,9 @@ let scene: THREE.Scene, // 场景
   CSS2LabelRenderer: CSS2DRenderer, // css2D渲染器
   model: THREE.Group, // 模型集合
   status: Status, // 性能监视器
-  controls: OrbitControls // 相机控制器
+  controls: OrbitControls, // 相机控制器
+  composer: EffectComposer, // 后处理
+  outlinePass: OutlinePass
 
 // 初始化
 const init = () => {
@@ -88,7 +93,9 @@ const init = () => {
     css3Drenderer: mCss3Drenderer,
     css2Drenderer: mCss2Drenderer,
     controls: mControls,
-    status: mStatus
+    status: mStatus,
+    composer: mComposer,
+    outlinePass: mOutlinePass
   } = useThree(document.getElementById('webgl') as HTMLCanvasElement)
   scene = mScene
   camera = mCamera
@@ -97,6 +104,8 @@ const init = () => {
   renderer = mRenderer
   CSS3LabelRenderer = mCss3Drenderer
   CSS2LabelRenderer = mCss2Drenderer
+  composer = mComposer
+  outlinePass = mOutlinePass
   // 添加性能监视器
   if (useStatusByEnv()) {
     statusRef.value?.appendChild(mStatus.dom)
@@ -143,6 +152,7 @@ const handlePointerClick = (e: Event) => {
   if (isExecutTween.value) return
   if (currentChooseModel) {
     currentChooseModel = null
+    outlinePass.selectedObjects = []
   }
   // 转换鼠标点击坐标
   const { x, y } = usePointer(e)
@@ -164,7 +174,6 @@ const handlePointerClick = (e: Event) => {
     const windowTag = useCSS2DObject({ dom })
     // 添加标签到模型中
     model!.add(windowTag)
-    // currentChooseModel!.add(windowTag)
     // 获取收费窗口世界坐标
     const pos = new THREE.Vector3()
     currentChooseModel.getWorldPosition(pos)
@@ -172,6 +181,8 @@ const handlePointerClick = (e: Event) => {
     pos.add(offet)
     // 设置标签的位置
     windowTag.position.copy(pos)
+    // 设置后处理
+    outlinePass.selectedObjects = [chooseObj]
     // 执行相机动画
     executeWindowTween()
   }
@@ -194,6 +205,8 @@ const executeWindowTween = () => {
     })
     currentChooseModel.out.onComplete(function () {
       isExecutTween.value = false
+      outlinePass.selectedObjects = []
+      currentChooseModel = null
     })
   })
 }
@@ -205,6 +218,7 @@ const animate = () => {
   // const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene!, camera)
+  composer && composer.render(scene!, camera)
   // css3D渲染器渲染
   CSS3LabelRenderer && CSS3LabelRenderer.render(scene, camera)
   // css2D渲染器渲染

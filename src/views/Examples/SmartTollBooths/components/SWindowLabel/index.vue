@@ -45,7 +45,7 @@ watch(
           // 一旦达到当日通车数量，取消周期性函数interval
           clearInterval(interval)
         }
-      }, 10)
+      }, 5)
     }
   },
   { immediate: true, deep: true }

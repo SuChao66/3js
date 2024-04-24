@@ -20,6 +20,7 @@ export * from './three/useEnvironmentTexture'
 export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'
 export * from './effectPass/useGammaPass'
+export * from './effectPass/useFxaaPass'
 // 公共hook
 export * from './common/useWindowSize'
 export * from './common/useCameraTween'

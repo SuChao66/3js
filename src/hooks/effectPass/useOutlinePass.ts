@@ -5,9 +5,10 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass'
 export const useOutlinePass = (
   scene: THREE.Scene,
   camera: THREE.PerspectiveCamera,
-  color: number = 0x00ffff,
-  edgeThickness: number = 4,
-  edgeStrength: number = 6
+  color: number = 0x00ffff, // 模型描边颜色，默认白色
+  edgeThickness: number = 4, // 轮廓边缘描边厚度
+  edgeStrength: number = 6, // 边缘发光强度,数值大，更亮一些
+  pulsePeriod: number = 2 // 模型闪烁频率，默认0不闪烁
 ) => {
   let outlinePass: OutlinePass
 
@@ -16,6 +17,7 @@ export const useOutlinePass = (
   outlinePass.visibleEdgeColor.set(color)
   outlinePass.edgeThickness = edgeThickness
   outlinePass.edgeStrength = edgeStrength
+  outlinePass.pulsePeriod = pulsePeriod
 
   return {
     outlinePass
