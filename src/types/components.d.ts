@@ -21,6 +21,7 @@ declare module 'vue' {
     ElMain: typeof import('element-plus/es')['ElMain']
     ElProgress: typeof import('element-plus/es')['ElProgress']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElStatistic: typeof import('element-plus/es')['ElStatistic']
     Header: typeof import('./../components/Header/index.vue')['default']
     Locale: typeof import('./../components/Locale/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

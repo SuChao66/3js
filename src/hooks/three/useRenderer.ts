@@ -8,7 +8,10 @@ import * as THREE from 'three'
 export const useRenderer = (canvas: HTMLCanvasElement) => {
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: true // 抗锯齿
+    // 抗锯齿
+    antialias: true,
+    // 对数深度缓冲区解决深度冲突问题
+    logarithmicDepthBuffer: true
   })
   // 设置设备像素比
   renderer.setPixelRatio(window.devicePixelRatio)

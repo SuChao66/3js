@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 // 导入类型
 import type { ICard } from '@/type'
 // 导入图片
-import smartFactorySmall from '@/assets/images/smart-factory-small.png'
+import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例

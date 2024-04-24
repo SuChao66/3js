@@ -148,8 +148,6 @@ const angleMax = THREE.MathUtils.degToRad(15)
 // true表示第三人称，false表示第一人称
 const viewBool = ref<boolean>(true)
 
-const { initThree } = useThree()
-
 onMounted(() => {
   const {
     scene: mScene,
@@ -160,7 +158,7 @@ onMounted(() => {
     status: mStatus,
     cameraPos: mCameraPos,
     controlsTarget: mControlsTarget
-  } = initThree(document.getElementById('webgl') as HTMLCanvasElement)
+  } = useThree(document.getElementById('webgl') as HTMLCanvasElement)
   scene = mScene
   camera = mCamera
   status = mStatus

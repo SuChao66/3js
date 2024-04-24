@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import smartFactory from '@/assets/images/smart-factory.png'
+import smartFactory from '@/assets/images/swiper/smart-factory.png'
 // 导入类型
 import type { IProps } from './types'
 // 导入路由
