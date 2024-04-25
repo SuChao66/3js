@@ -14,6 +14,14 @@
     <div ref="laneTagRef"></div>
     <!-- 收费窗口渲染 -->
     <div ref="windowTagRef"></div>
+    <!-- 控制按钮 -->
+    <transition name="fade">
+      <SControl
+        v-if="!isLoading && dangGanArr.length > 0"
+        :dangGans="dangGanArr"
+        @handleSpriteClick="handleSpriteClick"
+      />
+    </transition>
     <!-- canvas画布 -->
     <canvas id="webgl"></canvas>
   </div>
@@ -44,13 +52,20 @@ import {
   useStatusByEnv,
   usePointer,
   useRayCaster,
+  useGroupRayCaster,
   useCSS2DObject
 } from '@/hooks'
-import { useThree, useLaneLabel, useWindowLabelTween } from './hook'
+import {
+  useThree,
+  useLaneLabel,
+  useWindowLabelTween,
+  usePointTag
+} from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import SLangLable from './components/SLangLabel/index.vue'
 import SWindowLabel from './components/SWindowLabel/index.vue'
+import SControl from './components/SControl/index.vue'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -71,6 +86,10 @@ let currentChooseModel: any
 let currentChooseModelName = ref<string>('')
 // 相机动画是否执行中
 const isExecutTween = ref<boolean>(false)
+// 挡杆精灵模型数组
+let spriteArr: THREE.Sprite[] = []
+// 挡杆模型数组
+let dangGanArr = ref<any[]>([])
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -134,6 +153,11 @@ const initModel = () => {
       useLaneLabel(model)
       // 给每一个收费窗口增加动画
       useWindowLabelTween(model, camera, controls)
+      // 给每一个收费站挡杆设置热点精灵
+      const { spriteArr: SpriteArr, dangGanArr: DangGanArr } =
+        usePointTag(model)
+      spriteArr = SpriteArr
+      dangGanArr.value = DangGanArr
     },
     (xhr) => {
       currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
@@ -146,7 +170,7 @@ const initModel = () => {
   )
 }
 
-// 射线拾取
+// 射线拾取：收费窗口拾取
 const handlePointerClick = (e: Event) => {
   // 相机动画执行中，禁止鼠标射线拾取
   if (isExecutTween.value) return
@@ -159,7 +183,7 @@ const handlePointerClick = (e: Event) => {
   // 获取收费窗口模型
   const chuangkou = model!.getObjectByName('收费窗口')
   // 计算射线拾取
-  const chooseObj = useRayCaster({
+  const chooseObj = useGroupRayCaster({
     x,
     y,
     chooseObjArr: chuangkou?.children,
@@ -211,6 +235,34 @@ const executeWindowTween = () => {
   })
 }
 
+// 射线拾取，挡杆热点精灵拾取
+const handleSpriteClick = (e: Event) => {
+  // 1.转换鼠标点击坐标
+  const { x, y } = usePointer(e)
+  // 2.获取射线拾取模型
+  const chooseObj = useRayCaster({
+    x,
+    y,
+    camera,
+    chooseObjArr: spriteArr
+  }) as any
+  if (chooseObj) {
+    const gz = dangGanArr.value[chooseObj.i]
+    // 判断挡杆的状态
+    if (gz.open) {
+      // 执行挡杆动画
+      gz.closeTween.start()
+      // 修改挡杆状态
+      gz.open = false
+    } else {
+      // 执行挡杆动画
+      gz.openTween.start()
+      // 修改挡杆状态
+      gz.open = true
+    }
+  }
+}
+
 // 渲染
 // const clock = new THREE.Clock()
 const animate = () => {
@@ -218,7 +270,7 @@ const animate = () => {
   // const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene!, camera)
-  composer && composer.render(scene!, camera)
+  composer && composer.render()
   // css3D渲染器渲染
   CSS3LabelRenderer && CSS3LabelRenderer.render(scene, camera)
   // css2D渲染器渲染
