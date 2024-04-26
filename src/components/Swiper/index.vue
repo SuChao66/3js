@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import smartFactory from '@/assets/images/swiper/smart-factory.png'
+import smartTollBooths from '@/assets/images/swiper/smart-toll-booths.png'
 // 导入类型
 import type { IProps } from './types'
 // 导入路由
@@ -37,16 +38,8 @@ const images = [
     path: 'SmartFactory'
   },
   {
-    url: smartFactory,
-    path: 'SmartFactory'
-  },
-  {
-    url: smartFactory,
-    path: 'SmartFactory'
-  },
-  {
-    url: smartFactory,
-    path: 'SmartFactory'
+    url: smartTollBooths,
+    path: 'SmartTollBooths'
   }
 ]
 

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { ICard } from '@/type'
 // 导入图片
 import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png'
+import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
@@ -17,7 +18,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 2,
       title: '数字孪生-收费站',
-      img: smartFactorySmall,
+      img: smartTollBoothsSmall,
       desc: '实时检测高速车流量',
       path: 'SmartTollBooths'
     },

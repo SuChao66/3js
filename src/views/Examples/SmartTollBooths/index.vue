@@ -10,6 +10,8 @@
     <SLangLable />
     <!-- 收费窗口标签 -->
     <SWindowLabel :name="currentChooseModelName" />
+    <!-- 车辆标签 -->
+    <SCarTag v-for="(car, index) in carArr" :key="index" :car="car" />
     <!-- 车道标签渲染 -->
     <div ref="laneTagRef"></div>
     <!-- 收费窗口渲染 -->
@@ -28,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick } from 'vue'
 // 导入THREE
 import * as THREE from 'three'
 // 导入性能监视器
@@ -53,19 +56,27 @@ import {
   usePointer,
   useRayCaster,
   useGroupRayCaster,
-  useCSS2DObject
+  useCSS2DObject,
+  useBox3
 } from '@/hooks'
 import {
   useThree,
   useLaneLabel,
   useWindowLabelTween,
-  usePointTag
+  usePointTag,
+  useCar,
+  useCarTag,
+  useCarTween,
+  useCarTweenFan
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import SLangLable from './components/SLangLabel/index.vue'
 import SWindowLabel from './components/SWindowLabel/index.vue'
 import SControl from './components/SControl/index.vue'
+import SCarTag from './components/SCarTag/index.vue'
+// 导入常量
+import { carsName } from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -90,6 +101,16 @@ const isExecutTween = ref<boolean>(false)
 let spriteArr: THREE.Sprite[] = []
 // 挡杆模型数组
 let dangGanArr = ref<any[]>([])
+// 所有车模型加载成功，设置为true，调用CarTag组件
+const carBool = ref<boolean>(false)
+// 数组元素：每一种车的gltf模型集合
+const carGltfArr: any[] = []
+// 场景中需要可视化的车辆，动态变化
+const carArr = ref<any[]>([])
+// 统计加载的车gltf文件数量
+const carNum = ref<number>(0)
+// 随机生成车辆定时器
+const carTimer = ref<any>(null)
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -102,6 +123,75 @@ let scene: THREE.Scene, // 场景
   controls: OrbitControls, // 相机控制器
   composer: EffectComposer, // 后处理
   outlinePass: OutlinePass
+
+// 监听车辆的加载状态
+watch(
+  () => carNum,
+  (val) => {
+    if (val.value === 6) {
+      // 表示所有车型加载成功
+      carBool.value = true
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+// 监听carBool，是否全部加载完成
+watch(
+  () => carBool,
+  (val) => {
+    if (val.value) {
+      carTimer.value = setInterval(() => {
+        // 随机生成车辆
+        const car = useCar(carGltfArr)
+        // 将车添加到carArr中
+        carArr.value.push(car)
+        nextTick(() => {
+          // 1.创建标签，并设置标签的位置
+          createCarTag(car)
+          // 2.设置车辆的位置坐标
+          setCarPosition(car)
+          // 3.创建车辆的动画
+          const div = document.getElementById('carTag') as HTMLDivElement
+          div!.style.opacity = '0.0'
+          if (car.order <= 4) {
+            useCarTween(car, div)
+          } else {
+            // 对向车道车辆绕着y轴旋转180度调头
+            car.rotateY(Math.PI)
+            useCarTweenFan(car, div)
+          }
+          // 4.执行车辆进站动画
+          setTimeout(() => {
+            car.stop.start()
+          }, 1000)
+          // 5.执行车辆出站动画
+          setTimeout(() => {
+            // const dangGan = model.getObjectByName('GZ00' + car.order) as any
+            const dangGan = dangGanArr.value[car.order - 1]
+            dangGan.openTween.start() // 挡杆打开
+            dangGan.open = true
+            dangGan.openTween.onComplete(() => {
+              // 挡杆打开结束，车开走
+              car.run.start()
+              // 车开走一定距离，挡杆关闭
+              setTimeout(() => {
+                dangGan.closeTween.start()
+                dangGan.open = false
+              }, 4000)
+              // 车离开动画
+              car.run.onComplete(() => {
+                // 从场景中移除车
+                model.remove(car)
+              })
+            })
+          }, 6000)
+        })
+      }, 3000)
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 // 初始化
 const init = () => {
@@ -127,7 +217,7 @@ const init = () => {
   outlinePass = mOutlinePass
   // 添加性能监视器
   if (useStatusByEnv()) {
-    statusRef.value?.appendChild(mStatus.dom)
+    // statusRef.value?.appendChild(mStatus.dom)
   }
   // 添加css3DRenderer
   laneTagRef.value?.appendChild(CSS3LabelRenderer.domElement)
@@ -158,9 +248,11 @@ const initModel = () => {
         usePointTag(model)
       spriteArr = SpriteArr
       dangGanArr.value = DangGanArr
+      // 加载车模型
+      initCarModel(loader)
     },
     (xhr) => {
-      currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
+      currentProgress.value = Number(Math.round((xhr.loaded / 2616064) * 100))
       if (currentProgress.value === 100) {
         setTimeout(() => {
           isLoading.value = false
@@ -168,6 +260,43 @@ const initModel = () => {
       }
     }
   )
+}
+
+// 加载车的模型
+const initCarModel = (loader: any) => {
+  for (let i = 0; i < carsName.length; i++) {
+    loader.load('./models/cars/' + carsName[i] + '.glb', function (gltf: any) {
+      carNum.value += 1
+      carGltfArr.push(gltf.scene)
+      // 文件名作为车name的属性值
+      gltf.scene.name = carsName[i]
+    })
+  }
+}
+
+// 创建车的标签
+const createCarTag = (car: any) => {
+  const label = useCarTag(car.order)
+  car.add(label)
+  // 创建车辆的包围盒
+  const { size } = useBox3({ model: car })
+  if (car.order <= 4) {
+    label.position.y += size.y + 2
+  } else {
+    label.position.y += size.y + 3
+  }
+}
+
+// 设置车辆的位置坐标
+const setCarPosition = (car: any) => {
+  const road = model.getObjectByName('CD0' + car.order)
+  // 获取车辆标注点的世界坐标
+  const pos = new THREE.Vector3()
+  road?.getWorldPosition(pos)
+  // 把车辆放置在车道中线
+  car.position.x = pos.x
+  car.position.z = 40
+  model.add(car)
 }
 
 // 射线拾取：收费窗口拾取
@@ -264,10 +393,7 @@ const handleSpriteClick = (e: Event) => {
 }
 
 // 渲染
-// const clock = new THREE.Clock()
 const animate = () => {
-  // 获取上下两针时间间隔
-  // const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene!, camera)
   composer && composer.render()
@@ -330,6 +456,9 @@ onUnmounted(() => {
   renderer.clear()
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
+  // 清除定时器
+  clearInterval(carTimer.value)
+  carTimer.value = null
   // 注册鼠标点击事件
   renderer.domElement.removeEventListener('click', handlePointerClick)
 })
