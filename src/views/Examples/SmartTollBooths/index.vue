@@ -30,7 +30,6 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from 'vue'
 // 导入THREE
 import * as THREE from 'three'
 // 导入性能监视器
@@ -83,7 +82,7 @@ const { width, height } = useWindowSize()
 // 性能监视器
 const statusRef = ref<HTMLDivElement | null>(null)
 // 是否加载进度条
-const isLoading = ref<boolean>(false)
+const isLoading = ref<boolean>(true)
 // 模型加载进度
 const currentProgress = ref<number>(0)
 // 请求动画帧
@@ -146,7 +145,7 @@ watch(
         const car = useCar(carGltfArr)
         // 将车添加到carArr中
         carArr.value.push(car)
-        nextTick(() => {
+        setTimeout(() => {
           // 1.创建标签，并设置标签的位置
           createCarTag(car)
           // 2.设置车辆的位置坐标
@@ -167,7 +166,6 @@ watch(
           }, 1000)
           // 5.执行车辆出站动画
           setTimeout(() => {
-            // const dangGan = model.getObjectByName('GZ00' + car.order) as any
             const dangGan = dangGanArr.value[car.order - 1]
             dangGan.openTween.start() // 挡杆打开
             dangGan.open = true
@@ -186,7 +184,7 @@ watch(
               })
             })
           }, 6000)
-        })
+        }, 1000)
       }, 3000)
     }
   },
@@ -217,7 +215,7 @@ const init = () => {
   outlinePass = mOutlinePass
   // 添加性能监视器
   if (useStatusByEnv()) {
-    // statusRef.value?.appendChild(mStatus.dom)
+    statusRef.value?.appendChild(mStatus.dom)
   }
   // 添加css3DRenderer
   laneTagRef.value?.appendChild(CSS3LabelRenderer.domElement)
