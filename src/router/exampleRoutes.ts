@@ -1,25 +1,13 @@
 // 导入类型
 import type { RouteRecordRaw } from 'vue-router'
+// 数字孪生
+import { DigitalTwinsRoutes } from './digitalTwins'
+// 3D展览
+import { ExhibitionRoutes } from './exhibition'
 
 const exampleRoutes: Array<RouteRecordRaw> = [
-  // 1.智慧工厂
-  {
-    name: 'SmartFactory',
-    path: '/smartFactory',
-    meta: {
-      title: 'SmartFactory'
-    },
-    component: () => import('@/views/Examples/SmartFactory/index.vue')
-  },
-  // 2.智慧收费站
-  {
-    name: 'SmartTollBooths',
-    path: '/smartTollBooths',
-    meta: {
-      title: 'SmartTollBooths'
-    },
-    component: () => import('@/views/Examples/SmartTollBooths/index.vue')
-  }
+  ...DigitalTwinsRoutes,
+  ...ExhibitionRoutes
 ]
 
 export { exampleRoutes }

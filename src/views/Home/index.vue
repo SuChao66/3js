@@ -5,27 +5,14 @@
       <el-main>
         <!-- 轮播图 -->
         <Swiper />
-        <!-- threejs案例 -->
-        <STitle title="数字孪生" />
-        <div class="example-list" v-if="isRender">
-          <SCard
-            v-for="item in exmaples.digitalTwinsExamples"
-            :key="item.key"
-            :card="item"
-            :column="column"
-          />
-        </div>
-        <!-- <STitle title="元宇宙" />
-        <div class="example-list" v-if="isRender">
-          <SCard
-            v-for="item in exmaples.metaverseExamples"
-            :key="item.key"
-            :card="item"
-            :column="column"
-          />
-        </div>
-        <STitle title="3D可视化大屏" />
-        <STitle title="3D全景可视化" /> -->
+        <!-- 数字孪生 -->
+        <DigitalTwins :column="column" :isRender="isRender" />
+        <!-- 3D展览 -->
+        <Exhibition :column="column" :isRender="isRender" />
+        <!-- 元宇宙 -->
+        <Mataverse :column="column" :isRender="isRender" />
+        <!-- 3D数据可视化 -->
+        <Visualization :column="column" :isRender="isRender" />
       </el-main>
     </el-container>
   </div>
@@ -35,14 +22,13 @@
 // 导入组件
 import Header from '@/components/Header/index.vue'
 import Swiper from '@/components/Swiper/index.vue'
-import STitle from '@/baseui/STitle/index.vue'
-import SCard from '@/baseui/SCard/index.vue'
+import DigitalTwins from './modules/DigitalTwins/index.vue'
+import Mataverse from './modules/Mataverse/index.vue'
+import Exhibition from './modules/Exhibition/index.vue'
+import Visualization from './modules/Visualization/index.vue'
 // 导入hook
 import { useWindowSize } from '@/hooks'
-// 导入store
-import { useStore } from '@/store'
 
-const { exmaples } = useStore()
 const { width } = useWindowSize()
 // 是否渲染作品card
 const isRender = ref<boolean>(true)
