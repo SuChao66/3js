@@ -8,12 +8,14 @@ export const useSprite = ({
   path,
   scale = new THREE.Vector3(1.0, 1.0, 1.0),
   color = new THREE.Color(0x00ffff),
-  animation = false
+  animation = false,
+  Smax = 0.6
 }: {
   path: string
   scale?: THREE.Vector3
   color?: THREE.Color
   animation?: boolean
+  Smax?: number
 }) => {
   const spriteMaterial = new THREE.SpriteMaterial({
     map: new THREE.TextureLoader().load(path),
@@ -25,7 +27,6 @@ export const useSprite = ({
 
   // 设置标注精灵Sprite波动，提示用户点击
   let s = 0.0
-  const Smax = 0.6
   function waveAnimation() {
     s += 0.01
     if (s < 0.5) {

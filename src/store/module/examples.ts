@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 // 导入类型
 import type { ICard } from '@/baseui/SCard/types'
 // 导入图片
-import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png'
-import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png'
+import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png' // 智慧工厂
+import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
+import moblie from '@/assets/images/examples/moblie.png' // 3D手机
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -45,8 +46,8 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 1,
       title: '华为P10',
-      img: smartFactorySmall,
-      desc: '国货之光',
+      img: moblie,
+      desc: '国货之光，支持国货，从你我做起',
       path: 'Mobile'
     }
   ])
