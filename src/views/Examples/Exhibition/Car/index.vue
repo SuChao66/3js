@@ -76,7 +76,7 @@ const isPlayBackgroundVoice = ref<boolean>(false)
 // 车辆颜色变化动画
 const colorTween = ref<any>(null)
 // 背景音乐播放器
-const backgroundAudio = ref<any>(null)
+let backgroundAudio: any = null
 // 是否打开车灯
 const isOpenLight = ref<boolean>(false)
 let openLight: any, closeLight: any
@@ -135,7 +135,7 @@ const initModel = () => {
       // 7.创建车辆颜色变化动画
       colorTween.value = useCarColorTween(model)
       // 8.创建背景音乐
-      backgroundAudio.value = useBgMusic()
+      backgroundAudio = useBgMusic()
       // 9.创建镜头光晕效果
       const { lensflare1, lensflare2, openCarLight, closeCarLight } =
         useCarLight(scene, textureCube)
@@ -181,9 +181,9 @@ const handleChangeColor = () => {
 // 播放背景音乐
 const handleMusic = () => {
   if (isPlayBackgroundVoice.value) {
-    backgroundAudio.value.pause()
+    backgroundAudio.pause()
   } else {
-    backgroundAudio.value.play()
+    backgroundAudio.play()
   }
   isPlayBackgroundVoice.value = !isPlayBackgroundVoice.value
 }
@@ -252,8 +252,8 @@ onUnmounted(() => {
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
   // 停止播放音乐
-  backgroundAudio.value && backgroundAudio.value.pause()
-  backgroundAudio.value = null
+  backgroundAudio && backgroundAudio.pause()
+  backgroundAudio = null
   // 停止变色
   colorTween.value && colorTween.value.stop()
   colorTween.value = null

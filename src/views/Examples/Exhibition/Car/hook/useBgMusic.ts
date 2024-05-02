@@ -7,7 +7,7 @@ import { useAudio } from '@/hooks'
  */
 export const useBgMusic = () => {
   const backgroundAudio = useAudio({
-    path: './voice/背景.wav',
+    path: './voice/bg.wav',
     volume: 0.2,
     loop: true
   })
