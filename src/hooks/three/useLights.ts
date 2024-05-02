@@ -9,12 +9,15 @@ export const useLights = () => {
    */
   const initAmbientLight = ({
     density = 0.4,
-    scene
+    scene,
+    name = '环境光'
   }: {
     density?: number
     scene: THREE.Scene
+    name?: string
   }) => {
     const ambient = new THREE.AmbientLight(0xffffff, density)
+    ambient.name = name
     scene.add(ambient)
   }
 
@@ -31,16 +34,19 @@ export const useLights = () => {
     density = 1,
     position = new THREE.Vector3(0, 0, 0),
     isShowHelper = false,
-    scene
+    scene,
+    name = '平行光'
   }: {
     color?: number
     density?: number
     position?: THREE.Vector3
     isShowHelper?: boolean
     scene: THREE.Scene
+    name?: string
   }) => {
     const directionalLight = new THREE.DirectionalLight(color, density)
     directionalLight.position.copy(position)
+    directionalLight.name = name
     if (isShowHelper) {
       const helper = new THREE.DirectionalLightHelper(
         directionalLight,
@@ -69,7 +75,8 @@ export const useLights = () => {
     decay = 2,
     position = new THREE.Vector3(0, 0, 0),
     isShowHelper = false,
-    scene
+    scene,
+    name = '点光源'
   }: {
     color?: number
     density?: number
@@ -78,9 +85,11 @@ export const useLights = () => {
     position?: THREE.Vector3
     isShowHelper?: boolean
     scene: THREE.Scene
+    name?: string
   }) => {
     const pointLight = new THREE.PointLight(color, density, distance, decay)
     pointLight.position.copy(position)
+    pointLight.name = name
     if (isShowHelper) {
       const pointLightHelper = new THREE.PointLightHelper(
         pointLight,

@@ -7,6 +7,6 @@ import * as THREE from 'three'
 export const useEnvironmentTexture = ({ path }: { path: string }) => {
   const texture = new THREE.CubeTextureLoader()
     .setPath(path)
-    .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'])
+    .load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'])
   return texture
 }

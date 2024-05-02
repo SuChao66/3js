@@ -22,6 +22,7 @@ export * from './three/useSprite'
 export * from './three/useBox3'
 export * from './three/useGUI'
 export * from './three/useFont'
+export * from './three/useAudio'
 // three后处理hook
 export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'

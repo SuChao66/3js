@@ -35,6 +35,4 @@ const { column, isRender } = toRefs(props)
 const { exmaples } = useStore()
 </script>
 
-<style lang="less" scoped>
-@import './index.less';
-</style>
+<style lang="less" scoped></style>

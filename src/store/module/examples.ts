@@ -5,6 +5,7 @@ import type { ICard } from '@/baseui/SCard/types'
 import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png' // 智慧工厂
 import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
 import moblie from '@/assets/images/examples/moblie.png' // 3D手机
+import BYDSongSmall from '@/assets/images/examples/BYD-song-small.png' // BYD-宋
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -49,6 +50,13 @@ const useExampleStore = defineStore('examples', () => {
       img: moblie,
       desc: '国货之光，支持国货，从你我做起',
       path: 'Mobile'
+    },
+    {
+      key: 2,
+      title: '比亚迪-宋',
+      img: BYDSongSmall,
+      desc: 'This Is Your Dream Car',
+      path: 'Car'
     }
   ])
   // 4.3D数据可视化
