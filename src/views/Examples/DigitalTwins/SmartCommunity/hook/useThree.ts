@@ -11,7 +11,11 @@ import {
   useRenderer,
   useCSS2DRenderer,
   useControls,
-  useEnvironmentTexture
+  useEnvironmentTexture,
+  useEffectComposer,
+  useOutlinePass,
+  useGammaPass,
+  useFxaaComposer
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -25,7 +29,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   // 1.1.创建场景
   const scene = useScene()
   // 1.2.箭头辅助器
-  useAxesHelper({ size: 120, scene: scene })
+  // useAxesHelper({ size: 120, scene: scene })
   // 1.3.通过球体设置天空盒
   usePanorama({
     radius: 1200,
@@ -64,7 +68,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   const renderer = useRenderer(canvas)
   renderer.shadowMap.enabled = true // 设置渲染器，允许场景中使用阴影贴图
   renderer.shadowMap.type = THREE.VSMShadowMap // 以免模型表面产生条纹影响渲染效果
-  // renderer.physicallyCorrectLights = true // 物理校正光照计算
+  renderer.physicallyCorrectLights = true // 物理校正光照计算
   // 1.9.初始化性能监视器
   const status = useStatus()
   // 1.10.初始化相机控件
@@ -75,11 +79,19 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableZoom = true
   // 设置最大最小移动距离
   controls.maxDistance = 1000
-  controls.minDistance = 100
+  controls.minDistance = 0
   // 设置旋转
-  controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(80)
   // 1.11.创建css2D渲染器
   const css2DRenderer = useCSS2DRenderer()
+  // 1.12.后处理
+  const { composer } = useEffectComposer(renderer, scene, camera)
+  const { outlinePass } = useOutlinePass(scene, camera)
+  const { gammaPass } = useGammaPass()
+  const { FXAA } = useFxaaComposer()
+  composer.addPass(outlinePass)
+  composer.addPass(FXAA)
+  composer.addPass(gammaPass)
 
   return {
     scene,
@@ -87,6 +99,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
     renderer,
     controls,
     status,
-    css2DRenderer
+    css2DRenderer,
+    composer
   }
 }

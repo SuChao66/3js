@@ -26,12 +26,12 @@ export const useCommunityMaterial = (model: THREE.Group) => {
   waterMesh!.material.opacity = 0.7
   const map = waterMesh!.material.map
   // 4.处理窗户
-  const windows = model.getObjectByName('窗户') as any
-  windows.layers.enable(1)
+  const windowsObj = model.getObjectByName('窗户') as any
+  windowsObj.layers.enable(1)
   model.traverse((obj: any) => {
     if (obj.type === 'Mesh') {
       // 相同材质，统一改变layers
-      if (obj.material == windows.material) {
+      if (obj.material == windowsObj.material) {
         obj.layers.enable(1)
       }
     }

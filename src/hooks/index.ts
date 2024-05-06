@@ -28,6 +28,7 @@ export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'
 export * from './effectPass/useGammaPass'
 export * from './effectPass/useFxaaPass'
+export * from './effectPass/useUnrealBloomPass'
 // 公共hook
 export * from './common/useWindowSize'
 export * from './common/useCameraTween'

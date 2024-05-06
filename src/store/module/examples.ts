@@ -6,6 +6,7 @@ import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png'
 import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
 import moblie from '@/assets/images/examples/moblie.png' // 3D手机
 import BYDSongSmall from '@/assets/images/examples/BYD-song-small.png' // BYD-宋
+import smartCommunitySmall from '@/assets/images/examples/smart-community-small.png' // 智慧小区
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -28,7 +29,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 3,
       title: '智慧小区',
-      img: inDeveloping,
+      img: smartCommunitySmall,
       desc: '智慧小区，邻里和睦',
       path: 'SmartCommunity'
     },

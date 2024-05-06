@@ -10,6 +10,16 @@
       </template>
       <span class="text">{{ isDamping ? '全景' : '漫游' }}</span>
     </el-button>
+    <!-- 夜晚发光 -->
+    <!-- <el-button round plain size="large" @click="handleDark">
+      <template v-if="isDark">
+        <svg-icon icon-class="sunLight"></svg-icon>
+      </template>
+      <template v-else>
+        <svg-icon icon-class="moonLight"></svg-icon>
+      </template>
+      <span class="text">{{ isDark ? '白天' : '黑夜' }}</span>
+    </el-button> -->
   </div>
 </template>
 
@@ -19,9 +29,10 @@ import { toRefs } from 'vue'
 import type { IProps } from './types'
 
 // 0.定义props和emits
-const emits = defineEmits(['handleDamping'])
+const emits = defineEmits(['handleDamping', 'handleDark'])
 const props = withDefaults(defineProps<IProps>(), {
-  isDamping: false
+  isDamping: false,
+  isDark: false
 })
 const { isDamping } = toRefs(props)
 
@@ -29,6 +40,11 @@ const { isDamping } = toRefs(props)
 const handleDamping = () => {
   emits('handleDamping')
 }
+
+// 白天/黑夜
+// const handleDark = () => {
+//   emits('handleDark')
+// }
 </script>
 
 <style lang="less" scoped>
