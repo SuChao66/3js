@@ -27,17 +27,17 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 3,
-      title: '智慧园区',
-      img: inDeveloping,
-      desc: '智慧园区管理',
-      path: 'SmartPark'
-    },
-    {
-      key: 4,
       title: '智慧小区',
       img: inDeveloping,
       desc: '智慧小区，邻里和睦',
       path: 'SmartCommunity'
+    },
+    {
+      key: 4,
+      title: '智慧园区',
+      img: inDeveloping,
+      desc: '智慧园区管理',
+      path: 'SmartPark'
     }
   ])
   // 2.元宇宙

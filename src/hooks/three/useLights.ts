@@ -1,5 +1,17 @@
 import * as THREE from 'three'
 
+interface ICastShadowCameraConfig {
+  near: number
+  far: number
+  left: number
+  right: number
+  top: number
+  bottom: number
+  mapSizeW?: number
+  mapSizeH?: number
+  radius?: number
+}
+
 export const useLights = () => {
   /**
    * 创建环境光
@@ -28,6 +40,10 @@ export const useLights = () => {
    * @param position 位置
    * @param isShowHelper 是否显示光源辅助器
    * @param scene 场景
+   * @param name 光源名称
+   * @param isCastShadow 是否投射阴影
+   * @param castShadowCameraConfig: 阴影区域参数设置
+   * @param isShowCameraHelper: 是否显示相机阴影辅助器
    */
   const initDirectionalLight = ({
     color = 0xffffff,
@@ -35,7 +51,20 @@ export const useLights = () => {
     position = new THREE.Vector3(0, 0, 0),
     isShowHelper = false,
     scene,
-    name = '平行光'
+    name = '平行光',
+    isCastShadow = false,
+    castShadowCameraConfig = {
+      near: 0.5,
+      far: 3000,
+      left: -500,
+      right: 500,
+      top: 500,
+      bottom: -500,
+      mapSizeW: 1024 * 4,
+      mapSizeH: 1024 * 4,
+      radius: 3
+    },
+    isShowCameraHelper = false
   }: {
     color?: number
     density?: number
@@ -43,10 +72,16 @@ export const useLights = () => {
     isShowHelper?: boolean
     scene: THREE.Scene
     name?: string
+    isCastShadow?: boolean
+    castShadowCameraConfig?: ICastShadowCameraConfig
+    isShowCameraHelper?: boolean
   }) => {
+    // 0.创建平行光
     const directionalLight = new THREE.DirectionalLight(color, density)
     directionalLight.position.copy(position)
     directionalLight.name = name
+    scene.add(directionalLight)
+    // 1.是否旋转光源辅助器
     if (isShowHelper) {
       const helper = new THREE.DirectionalLightHelper(
         directionalLight,
@@ -55,7 +90,38 @@ export const useLights = () => {
       )
       scene.add(helper)
     }
-    scene.add(directionalLight)
+    // 2.是否投射阴影
+    if (isCastShadow) {
+      // 设置用于计算阴影的光源对象
+      directionalLight.castShadow = true
+      // 设置计算阴影的区域，最好刚好紧密包围在对象周围
+      // 计算阴影的区域过大：模糊  过小：看不到或显示不完整
+      directionalLight.shadow.camera.near = castShadowCameraConfig.near
+      directionalLight.shadow.camera.far = castShadowCameraConfig.far
+      directionalLight.shadow.camera.left = castShadowCameraConfig.left
+      directionalLight.shadow.camera.right = castShadowCameraConfig.right
+      directionalLight.shadow.camera.top = castShadowCameraConfig.top
+      directionalLight.shadow.camera.bottom = castShadowCameraConfig.bottom
+      // 为了清晰度，提升阴影贴图的尺寸
+      if (castShadowCameraConfig.mapSizeW) {
+        directionalLight.shadow.mapSize.width = castShadowCameraConfig.mapSizeW
+      }
+      if (castShadowCameraConfig.mapSizeH) {
+        directionalLight.shadow.mapSize.height = castShadowCameraConfig.mapSizeH
+      }
+      // 模糊阴影的边缘
+      if (castShadowCameraConfig.radius) {
+        directionalLight.shadow.radius = castShadowCameraConfig.radius
+      }
+    }
+    // 3.可视化相机阴影
+    if (isShowCameraHelper) {
+      // 可视化平行光阴影对应的正投影相机对象
+      const cameraHelper = new THREE.CameraHelper(
+        directionalLight.shadow.camera
+      )
+      scene.add(cameraHelper)
+    }
   }
 
   /**
