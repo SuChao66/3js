@@ -4,7 +4,7 @@
  * @param longitude 径度
  * @param latitude 纬度
  */
-export const useLog2xyz = (R: number, longitude: number, latitude: number) => {
+export const useLon2xyz = (R: number, longitude: number, latitude: number) => {
   // 将经纬度转换为弧度值
   let lon = (longitude * Math.PI) / 180 // 经度
   const lat = (latitude * Math.PI) / 180 // 纬度

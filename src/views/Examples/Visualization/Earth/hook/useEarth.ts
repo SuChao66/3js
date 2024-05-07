@@ -9,7 +9,7 @@ import { earthRadius } from '../constants'
  */
 export const useEarth = () => {
   // 加载纹理
-  const texture = useTexture({ path: './images/earth/earth.jpg' })
+  const texture = useTexture({ path: './images/earth/earth.png' })
   // 创建一个球体几何对象
   const geometry = new THREE.SphereGeometry(earthRadius, 40, 40)
   // 材质对象Material

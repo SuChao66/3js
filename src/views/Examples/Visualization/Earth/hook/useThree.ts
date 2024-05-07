@@ -7,8 +7,7 @@ import {
   useStatus,
   useRenderer,
   useControls,
-  useAxesHelper,
-  useGUI
+  useAxesHelper
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget, s } from '../constants'
@@ -53,15 +52,12 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
-  // 1.9.创建gui控制器
-  const gui = useGUI()
 
   return {
     scene,
     camera,
     renderer,
     controls,
-    status,
-    gui
+    status
   }
 }
