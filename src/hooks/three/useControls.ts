@@ -13,7 +13,7 @@ export const useControls = () => {
     camera,
     renderer
   }: {
-    camera: THREE.PerspectiveCamera
+    camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
     renderer: THREE.WebGLRenderer
   }) => {
     const controls = new OrbitControls(camera!, renderer!.domElement)
