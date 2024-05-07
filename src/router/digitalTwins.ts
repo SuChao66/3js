@@ -22,15 +22,14 @@ const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
     component: () =>
       import('@/views/Examples/DigitalTwins/SmartTollBooths/index.vue')
   },
-  // 3.智慧园区
+  // 3.智慧城市
   {
-    name: 'SmartPark',
-    path: '/smartPark',
+    name: 'SmartCity',
+    path: '/smartCity',
     meta: {
-      title: 'SmartPark'
+      title: 'SmartCity'
     },
-    component: () =>
-      import('@/views/Examples/DigitalTwins/SmartParks/index.vue')
+    component: () => import('@/views/Examples/DigitalTwins/SmartCity/index.vue')
   },
   // 4.智慧小区
   {

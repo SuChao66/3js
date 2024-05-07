@@ -35,10 +35,10 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 4,
-      title: '智慧园区',
+      title: '智慧城市',
       img: inDeveloping,
-      desc: '智慧园区管理',
-      path: 'SmartPark'
+      desc: '智慧城市管理',
+      path: 'SmartCity'
     }
   ])
   // 2.元宇宙
@@ -61,7 +61,22 @@ const useExampleStore = defineStore('examples', () => {
     }
   ])
   // 4.3D数据可视化
-  const visualizationExamples = reactive<ICard[]>([])
+  const visualizationExamples = reactive<ICard[]>([
+    {
+      key: 1,
+      title: '3D地图可视化',
+      img: inDeveloping,
+      desc: '3D地图可视化',
+      path: '3dMap'
+    },
+    {
+      key: 2,
+      title: '3D地球可视化',
+      img: inDeveloping,
+      desc: '3D地球可视化',
+      path: '3dEarth'
+    }
+  ])
 
   return {
     digitalTwinsExamples,

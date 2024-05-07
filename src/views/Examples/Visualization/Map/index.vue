@@ -1,5 +1,5 @@
 <template>
-  <div>智慧园区，敬请期待</div>
+  <div>3D 地图</div>
 </template>
 
 <script setup lang="ts"></script>

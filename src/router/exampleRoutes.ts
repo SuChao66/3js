@@ -4,10 +4,13 @@ import type { RouteRecordRaw } from 'vue-router'
 import { DigitalTwinsRoutes } from './digitalTwins'
 // 3D展览
 import { ExhibitionRoutes } from './exhibition'
+// 3D可视化
+import { VisualizationRoutes } from './visualization'
 
 const exampleRoutes: Array<RouteRecordRaw> = [
   ...DigitalTwinsRoutes,
-  ...ExhibitionRoutes
+  ...ExhibitionRoutes,
+  ...VisualizationRoutes
 ]
 
 export { exampleRoutes }

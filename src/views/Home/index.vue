@@ -9,10 +9,10 @@
         <DigitalTwins :column="column" :isRender="isRender" />
         <!-- 3D展览 -->
         <Exhibition :column="column" :isRender="isRender" />
-        <!-- 元宇宙 -->
-        <Mataverse :column="column" :isRender="isRender" />
         <!-- 3D数据可视化 -->
         <Visualization :column="column" :isRender="isRender" />
+        <!-- 元宇宙 -->
+        <Mataverse :column="column" :isRender="isRender" />
       </el-main>
     </el-container>
   </div>
