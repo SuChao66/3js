@@ -28,9 +28,11 @@ import {
   useCountryLine,
   // useEarthAirPorts,
   // useEarthPoints,
-  useEarthWay,
+  // useEarthWay,
   useEarthCircle,
-  useEarthCircleTween
+  useEarthCircleTween,
+  useMarkPoint,
+  useMarkPointTween
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
@@ -98,8 +100,12 @@ const initModel = async () => {
   // const pointGroup = await useEarthPoints('./data/points.json')
   // model.add(pointGroup as any)
   // 7.可视化全球公路铁路线
-  const earthWayGroup = await useEarthWay('./data/railway.json')
-  model.add(earthWayGroup as any)
+  // const earthWayGroup = await useEarthWay('./data/railway.json')
+  // model.add(earthWayGroup as any)
+  // 8.标注郑州
+  const mesh = useMarkPoint(113.4668, 33.8818)
+  model.add(mesh as any)
+  useMarkPointTween(mesh)
   // 结束loading
   isLoading.value = false
 }
