@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 // 导入hook
-import { useMarkPoint, useMarkPointTween } from './'
+import { useMarkPoint } from './'
 
 /**
  * 标注热点新闻
@@ -30,7 +30,6 @@ export const useHotNews = (path: string) => {
           minScale: Math.random() * 0.05,
           maxScale: Math.random() * 0.15
         })
-        useMarkPointTween(mesh)
         spriteGroup.add(mesh)
       }
     })

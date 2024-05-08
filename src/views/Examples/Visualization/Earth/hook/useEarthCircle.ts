@@ -1,11 +1,29 @@
 import * as THREE from 'three'
 // 导入hook
 import { useTexture } from '@/hooks'
-import { useEarthCircleTween } from './'
 // 导入常量
 import { earthRadius } from '../constants'
 // 导入TWEEN
 import * as TWEEN from '@tweenjs/tween.js'
+
+// 创建地球光圈的渐变动画
+export const useEarthCircleTween = (sprite: any) => {
+  sprite.fadeIn
+    .start()
+    .onUpdate((obj: any) => {
+      sprite.material.opacity = obj.opacity
+    })
+    .onComplete(() => {
+      sprite.fadeOut
+        .start()
+        .onUpdate((obj: any) => {
+          sprite.material.opacity = obj.opacity
+        })
+        .onComplete(() => {
+          sprite.fadeIn.start()
+        })
+    })
+}
 
 /**
  * 创建地球光圈

@@ -7,6 +7,28 @@ import { earthRadius } from '../constants'
 import * as TWEEN from '@tweenjs/tween.js'
 
 /**
+ * 创建地球表面标注点的动画
+ * @param sprite
+ */
+export const useMarkPointTween = (sprite: any) => {
+  sprite.zoomIn
+    .start()
+    .onUpdate((obj: any) => {
+      sprite.scale.set(obj.scale, obj.scale, obj.scale)
+    })
+    .onComplete(() => {
+      sprite.zoomOut
+        .start()
+        .onUpdate((obj: any) => {
+          sprite.scale.set(obj.scale, obj.scale, obj.scale)
+        })
+        .onComplete(() => {
+          sprite.zoomIn.start()
+        })
+    })
+}
+
+/**
  * 使用标注点，标注指定地点
  * @param R 地球半径
  * @param lon 经度
@@ -56,6 +78,7 @@ export const useMarkPoint = ({
     )
     mesh.zoomIn = zoomIn
     mesh.zoomOut = zoomOut
+    useMarkPointTween(mesh)
   }
   // 5.经纬度转球面坐标，将精灵图设置在地球表面
   const { x, y, z } = useLon2xyz(earthRadius * 1.001, lon, lat)

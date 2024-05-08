@@ -29,8 +29,8 @@ import {
   // useEarthAirPortsByTexture,
   // useEarthPoints,
   // useEarthWay,
-  useEarthCircle
-  // useHotNews
+  useEarthCircle,
+  useHotNews
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
@@ -104,8 +104,8 @@ const initModel = async () => {
   // const earthWayGroup = await useEarthWay('./data/railway.json')
   // model.add(earthWayGroup as any)
   // 8.标注热点新闻地
-  // const meshGroup = await useHotNews('./data/hotNews.json')
-  // model.add(meshGroup as any)
+  const meshGroup = await useHotNews('./data/hotNews.json')
+  model.add(meshGroup as any)
   // 结束loading
   isLoading.value = false
 }
