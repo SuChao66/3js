@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 // 导入hook
 import { useTexture } from '@/hooks'
+import { useEarthCircleTween } from './'
 // 导入常量
 import { earthRadius } from '../constants'
 // 导入TWEEN
@@ -28,6 +29,8 @@ export const useEarthCircle = (path: string) => {
   const fadeOut = new TWEEN.Tween({ opacity: 1.0 }).to({ opacity: 0.0 }, 1500)
   sprite.fadeIn = fadeIn
   sprite.fadeOut = fadeOut
+  // 5.播放动画
+  useEarthCircleTween(sprite)
 
   return sprite
 }

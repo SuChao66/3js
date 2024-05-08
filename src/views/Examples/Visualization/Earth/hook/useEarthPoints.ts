@@ -18,7 +18,6 @@ export const useEarthPoints = (path: string) => {
       const numArr = data.num // 所有点对应周边点数
       // 数组复制并排序，然后获得最大值
       const numMax = numArr.slice().sort(useSort)[numArr.length - 1]
-      // console.log(numMax) // 2395
       // 定义所有顶点数据
       const vertices: number[] = []
       // 所有顶点颜色数据

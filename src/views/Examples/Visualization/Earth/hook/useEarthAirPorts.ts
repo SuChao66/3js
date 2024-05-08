@@ -4,6 +4,12 @@ import { useLon2xyz, usePoints } from '@/hooks'
 // 导入常量
 import { earthRadius } from '../constants'
 
+/**
+ * 可视化全球机场
+ * @param path 机场数据
+ * @param type point/texture 表示用点还是纹理进行可视化
+ * @returns
+ */
 export const useEarthAirPorts = (path: string) => {
   // 1.创建文件加载器
   const loader = new THREE.FileLoader()
@@ -26,10 +32,8 @@ export const useEarthAirPorts = (path: string) => {
           vertices.push(x, y, z)
         }
       }
-      // 生成点模型
       const point = usePoints({ pointsArr: vertices })
       group.add(point)
-
       resolve(group)
     })
   })

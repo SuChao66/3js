@@ -26,13 +26,11 @@ import {
   useThree,
   useEarth,
   useCountryLine,
-  // useEarthAirPorts,
+  // useEarthAirPortsByTexture,
   // useEarthPoints,
   // useEarthWay,
-  useEarthCircle,
-  useEarthCircleTween,
-  useMarkPoint,
-  useMarkPointTween
+  useEarthCircle
+  // useHotNews
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
@@ -92,9 +90,12 @@ const initModel = async () => {
   // 4.创建地球光圈
   const sprite = useEarthCircle('./images/planets/glow.png')
   model.add(sprite)
-  useEarthCircleTween(sprite)
   // 5.可视化全球机场
   // const airportsGroup = await useEarthAirPorts('./data/airports.json')
+  // model.add(airportsGroup as any)
+  // const airportsGroup = await useEarthAirPortsByTexture(
+  //   './data/airports_small.json'
+  // )
   // model.add(airportsGroup as any)
   // 6.可视化点数据
   // const pointGroup = await useEarthPoints('./data/points.json')
@@ -102,10 +103,9 @@ const initModel = async () => {
   // 7.可视化全球公路铁路线
   // const earthWayGroup = await useEarthWay('./data/railway.json')
   // model.add(earthWayGroup as any)
-  // 8.标注郑州
-  const mesh = useMarkPoint(113.4668, 33.8818)
-  model.add(mesh as any)
-  useMarkPointTween(mesh)
+  // 8.标注热点新闻地
+  // const meshGroup = await useHotNews('./data/hotNews.json')
+  // model.add(meshGroup as any)
   // 结束loading
   isLoading.value = false
 }

@@ -12,9 +12,27 @@ import * as TWEEN from '@tweenjs/tween.js'
  * @param lon 经度
  * @param lat 纬度
  */
-export const useMarkPoint = (lon: number, lat: number, color = 0xffffff) => {
+export const useMarkPoint = ({
+  path,
+  lon,
+  lat,
+  color = 0xffffff,
+  duration = 1500,
+  minScale = 0.02,
+  maxScale = 0.1,
+  isAnimation = true
+}: {
+  path: string
+  lon: number
+  lat: number
+  color?: number
+  duration?: number
+  maxScale?: number
+  minScale?: number
+  isAnimation?: boolean
+}) => {
   // 1.加载精灵
-  const texture = useTexture({ path: './images/planets/circle.png' })
+  const texture = useTexture({ path: path })
   // 2.创建平面几何体
   const geometry = new THREE.PlaneGeometry(1, 1)
   // 3.创建材质
@@ -24,19 +42,21 @@ export const useMarkPoint = (lon: number, lat: number, color = 0xffffff) => {
     transparent: true
   })
   const mesh = new THREE.Mesh(geometry, material) as any
-  const size = earthRadius * 0.05 // 矩形平面Mesh的尺寸
+  const size = earthRadius * minScale // 矩形平面Mesh的尺寸
   mesh.scale.set(size, size, size) // 设置mesh大小
   // 4.创建标注点动画
-  const zoomIn = new TWEEN.Tween({ scale: earthRadius * 0.05 }).to(
-    { scale: earthRadius * 0.1 },
-    1500
-  )
-  const zoomOut = new TWEEN.Tween({ scale: earthRadius * 0.1 }).to(
-    { scale: earthRadius * 0.05 },
-    1500
-  )
-  mesh.zoomIn = zoomIn
-  mesh.zoomOut = zoomOut
+  if (isAnimation) {
+    const zoomIn = new TWEEN.Tween({ scale: earthRadius * minScale }).to(
+      { scale: earthRadius * maxScale },
+      duration
+    )
+    const zoomOut = new TWEEN.Tween({ scale: earthRadius * maxScale }).to(
+      { scale: earthRadius * minScale },
+      duration
+    )
+    mesh.zoomIn = zoomIn
+    mesh.zoomOut = zoomOut
+  }
   // 5.经纬度转球面坐标，将精灵图设置在地球表面
   const { x, y, z } = useLon2xyz(earthRadius * 1.001, lon, lat)
   mesh.position.set(x, y, z)
