@@ -18,9 +18,18 @@ import * as THREE from 'three'
 import Status from 'three/examples/jsm/libs/stats.module'
 // 导入相机控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// 导入TWEEN
+import * as TWEEN from '@tweenjs/tween.js'
 // 导入hooks
 import { useWindowSize, useStatusByEnv } from '@/hooks'
-import { useThree, useEarth, useWorldEarth } from './hook'
+import {
+  useThree,
+  useEarth,
+  useEarthLine,
+  useEarthAirPorts,
+  useEarthCircle,
+  useEarthCircleTween
+} from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 // 导入常量
@@ -75,9 +84,17 @@ const initModel = () => {
   model.add(earth)
   // 3.结束loading
   isLoading.value = false
-  // 5.加载world.json数据，生成地球纹理
-  useWorldEarth('./data/world.json').then((mapGroup: any) => {
+  // 5.加载world.json数据，生成地球边界线
+  useEarthLine('./data/world.json').then((mapGroup: any) => {
     model.add(mapGroup)
+  })
+  // 6.创建地球光圈
+  const sprite = useEarthCircle('./images/planets/glow.png')
+  model.add(sprite)
+  useEarthCircleTween(sprite)
+  // 7.可视化全球机场
+  useEarthAirPorts('./data/airports.json').then((pointGroup: any) => {
+    model.add(pointGroup)
   })
 }
 
@@ -89,6 +106,10 @@ const animate = () => {
   timer.value = requestAnimationFrame(animate)
   // 更新性能监视器
   status && status.update()
+  // 更新动画时间
+  TWEEN.update()
+  // 旋转模型
+  model.rotateY(0.005)
 }
 
 // 监听窗口的变化

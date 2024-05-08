@@ -26,6 +26,7 @@ export * from './three/useAudio'
 export * from './three/useTexture'
 export * from './three/useBufferGeometry'
 export * from './three/useLine'
+export * from './three/usePoints'
 export * from './three/useShape'
 // three后处理hook
 export * from './effectPass/useEffectComposer'
