@@ -26,7 +26,8 @@ import {
   useThree,
   useEarth,
   useEarthLine,
-  useEarthAirPorts,
+  // useEarthAirPorts,
+  useEarthPoints,
   useEarthCircle,
   useEarthCircleTween
 } from './hook'
@@ -75,27 +76,28 @@ const init = () => {
 }
 
 // 加载模型
-const initModel = () => {
+const initModel = async () => {
   // 1.创建地球
   model = new THREE.Group()
   scene.add(model)
   const earth = useEarth()
   // 2.添加至场景中
   model.add(earth)
-  // 3.结束loading
-  isLoading.value = false
-  // 5.加载world.json数据，生成地球边界线
-  useEarthLine('./data/world.json').then((mapGroup: any) => {
-    model.add(mapGroup)
-  })
-  // 6.创建地球光圈
+  // 3.加载world.json数据，生成地球边界线
+  const mapGroup = await useEarthLine('./data/world.json')
+  model.add(mapGroup as any)
+  // 4.创建地球光圈
   const sprite = useEarthCircle('./images/planets/glow.png')
   model.add(sprite)
   useEarthCircleTween(sprite)
-  // 7.可视化全球机场
-  useEarthAirPorts('./data/airports.json').then((pointGroup: any) => {
-    model.add(pointGroup)
-  })
+  // 5.可视化全球机场
+  // const airportsGroup = await useEarthAirPorts('./data/airports.json')
+  // model.add(airportsGroup as any)
+  // 6.可视化点数据
+  const pointGroup = await useEarthPoints('./data/points.json')
+  model.add(pointGroup as any)
+  // 结束loading
+  isLoading.value = false
 }
 
 // 渲染
