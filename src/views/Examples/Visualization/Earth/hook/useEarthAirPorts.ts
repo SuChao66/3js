@@ -12,7 +12,7 @@ export const useEarthAirPorts = (path: string) => {
   // 机场组对象
   const group = new THREE.Group()
   // 2.加载数据
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     loader.load(path, (data: any) => {
       // 定义所有机场的顶点数据
       const vertices: number[] = []

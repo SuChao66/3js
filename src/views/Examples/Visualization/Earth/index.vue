@@ -25,9 +25,10 @@ import { useWindowSize, useStatusByEnv } from '@/hooks'
 import {
   useThree,
   useEarth,
-  useEarthLine,
+  useCountryLine,
   // useEarthAirPorts,
-  useEarthPoints,
+  // useEarthPoints,
+  useEarthWay,
   useEarthCircle,
   useEarthCircleTween
 } from './hook'
@@ -84,7 +85,7 @@ const initModel = async () => {
   // 2.添加至场景中
   model.add(earth)
   // 3.加载world.json数据，生成地球边界线
-  const mapGroup = await useEarthLine('./data/world.json')
+  const mapGroup = await useCountryLine('./data/world.json')
   model.add(mapGroup as any)
   // 4.创建地球光圈
   const sprite = useEarthCircle('./images/planets/glow.png')
@@ -94,8 +95,11 @@ const initModel = async () => {
   // const airportsGroup = await useEarthAirPorts('./data/airports.json')
   // model.add(airportsGroup as any)
   // 6.可视化点数据
-  const pointGroup = await useEarthPoints('./data/points.json')
-  model.add(pointGroup as any)
+  // const pointGroup = await useEarthPoints('./data/points.json')
+  // model.add(pointGroup as any)
+  // 7.可视化全球公路铁路线
+  const earthWayGroup = await useEarthWay('./data/railway.json')
+  model.add(earthWayGroup as any)
   // 结束loading
   isLoading.value = false
 }

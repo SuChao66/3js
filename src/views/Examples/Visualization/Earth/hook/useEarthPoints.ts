@@ -12,7 +12,7 @@ export const useEarthPoints = (path: string) => {
   // 机场组对象
   const group = new THREE.Group()
   // 2.加载数据
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     loader.load(path, (data: any) => {
       const coordArr = data.points // 所有经纬度坐标数据
       const numArr = data.num // 所有点对应周边点数
