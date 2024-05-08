@@ -15,12 +15,14 @@ export const useMarkPointTween = (sprite: any) => {
     .start()
     .onUpdate((obj: any) => {
       sprite.scale.set(obj.scale, obj.scale, obj.scale)
+      sprite.material.opacity = obj.opacity
     })
     .onComplete(() => {
       sprite.zoomOut
         .start()
         .onUpdate((obj: any) => {
           sprite.scale.set(obj.scale, obj.scale, obj.scale)
+          sprite.material.opacity = obj.opacity
         })
         .onComplete(() => {
           sprite.zoomIn.start()
@@ -33,15 +35,20 @@ export const useMarkPointTween = (sprite: any) => {
  * @param R 地球半径
  * @param lon 经度
  * @param lat 纬度
+ * @param color 颜色
+ * @param duration 动画默认时长
+ * @param minScale 模型最小缩放
+ * @param maxScale 模型最大缩放
+ * @param isAnimation 是否执行动画
  */
 export const useMarkPoint = ({
   path,
   lon,
   lat,
-  color = 0xffffff,
+  color = 0x22ffcc,
   duration = 1500,
-  minScale = 0.02,
-  maxScale = 0.1,
+  minScale = 0.15,
+  maxScale = 0.2,
   isAnimation = true
 }: {
   path: string
@@ -61,21 +68,22 @@ export const useMarkPoint = ({
   const material = new THREE.MeshBasicMaterial({
     color: color,
     map: texture,
-    transparent: true
+    transparent: true,
+    depthWrite: false
   })
   const mesh = new THREE.Mesh(geometry, material) as any
   const size = earthRadius * minScale // 矩形平面Mesh的尺寸
   mesh.scale.set(size, size, size) // 设置mesh大小
   // 4.创建标注点动画
   if (isAnimation) {
-    const zoomIn = new TWEEN.Tween({ scale: earthRadius * minScale }).to(
-      { scale: earthRadius * maxScale },
-      duration
-    )
-    const zoomOut = new TWEEN.Tween({ scale: earthRadius * maxScale }).to(
-      { scale: earthRadius * minScale },
-      duration
-    )
+    const zoomIn = new TWEEN.Tween({
+      scale: earthRadius * minScale,
+      opacity: 0.2
+    }).to({ scale: earthRadius * maxScale, opacity: 1.0 }, duration)
+    const zoomOut = new TWEEN.Tween({
+      scale: earthRadius * maxScale,
+      opacity: 1.0
+    }).to({ scale: earthRadius * minScale, opacity: 0.2 }, duration)
     mesh.zoomIn = zoomIn
     mesh.zoomOut = zoomOut
     useMarkPointTween(mesh)

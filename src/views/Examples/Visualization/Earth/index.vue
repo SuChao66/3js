@@ -21,13 +21,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入TWEEN
 import * as TWEEN from '@tweenjs/tween.js'
 // 导入hooks
-import { useWindowSize, useStatusByEnv } from '@/hooks'
+import {
+  useWindowSize,
+  useStatusByEnv,
+  usePointer,
+  useRayCaster
+} from '@/hooks'
 import {
   useThree,
   useEarth,
   useCountryLine,
   // useEarthAirPortsByTexture,
-  // useEarthPoints,
   // useEarthWay,
   useEarthCircle,
   useHotNews
@@ -54,7 +58,8 @@ let scene: THREE.Scene, // 场景
   renderer: THREE.WebGLRenderer, // 渲染器
   status: Status, // 性能监视器
   controls: OrbitControls, // 相机控制器
-  model: THREE.Group // 地球网格模型
+  model: THREE.Group, // 地球网格模型
+  chooseGroup: THREE.Group // 光圈底座
 
 // 初始化
 const init = () => {
@@ -97,17 +102,31 @@ const initModel = async () => {
   //   './data/airports_small.json'
   // )
   // model.add(airportsGroup as any)
-  // 6.可视化点数据
-  // const pointGroup = await useEarthPoints('./data/points.json')
-  // model.add(pointGroup as any)
-  // 7.可视化全球公路铁路线
+  // 6.可视化全球公路铁路线
   // const earthWayGroup = await useEarthWay('./data/railway.json')
   // model.add(earthWayGroup as any)
-  // 8.标注热点新闻地
-  const meshGroup = await useHotNews('./data/hotNews.json')
-  model.add(meshGroup as any)
+  // 7.标注热点新闻地
+  const meshMap = (await useHotNews('./data/hotNews.json')) as any
+  chooseGroup = meshMap.chooseGroup
+  model.add(meshMap.spriteGroup)
   // 结束loading
   isLoading.value = false
+}
+
+// 鼠标点击事件，射线拾取
+const handlePointClick = (e: Event) => {
+  // 1.转换坐标
+  const { x, y } = usePointer(e)
+  // 2.射线拾取
+  const chooseObj = useRayCaster({
+    x,
+    y,
+    camera,
+    chooseObjArr: chooseGroup.children
+  }) as any
+  if (chooseObj) {
+    window.open(chooseObj.href)
+  }
 }
 
 // 渲染
@@ -121,7 +140,7 @@ const animate = () => {
   // 更新动画时间
   TWEEN.update()
   // 旋转模型
-  model.rotateY(0.005)
+  model.rotateY(0.0015)
 }
 
 // 监听窗口的变化
@@ -156,6 +175,8 @@ onMounted(() => {
   initModel()
   // 播放动画
   animate()
+  // 监听点击事件
+  renderer.domElement.addEventListener('click', handlePointClick)
 })
 
 onUnmounted(() => {
@@ -163,6 +184,8 @@ onUnmounted(() => {
   renderer.clear()
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
+  // 移除点击事件
+  renderer.domElement.removeEventListener('click', handlePointClick)
 })
 </script>
 

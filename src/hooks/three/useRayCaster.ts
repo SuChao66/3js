@@ -16,7 +16,7 @@ export const useRayCaster = ({
 }: {
   x: number
   y: number
-  camera: THREE.PerspectiveCamera
+  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
   chooseObjArr: THREE.Group | any
 }) => {
   // 1.创建一个射线拾取器
