@@ -10,11 +10,11 @@ import {
   useAxesHelper
 } from '@/hooks'
 // 导入常量
-import { cameraPos, cameraTarget } from '../constants'
+import { cameraPos, cameraTarget, s } from '../constants'
 
 export const useThree = (canvas: HTMLCanvasElement) => {
   const { initAmbientLight, initDirectionalLight } = useLights()
-  const { initPerspectiveCamera } = useCamera()
+  const { initOrthographicCamera } = useCamera()
   const { initControls } = useControls()
 
   // 1.1.创建场景
@@ -23,20 +23,22 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   // 箭头辅助器
   useAxesHelper({ size: 120, scene: scene })
   // 1.4.设置光源
-  initAmbientLight({ scene, density: 1.9 })
+  initAmbientLight({ scene, density: 0.6 })
   initDirectionalLight({
     scene,
-    density: 0.8,
-    position: new THREE.Vector3(100, 75, 30)
+    density: 0.6,
+    position: new THREE.Vector3(400, 200, 300),
+    name: '平行光1'
   })
   initDirectionalLight({
     scene,
-    density: 0.8,
-    position: new THREE.Vector3(-100, -75, -30)
+    density: 0.6,
+    position: new THREE.Vector3(-400, -200, -300),
+    name: '平行光2'
   })
   // 1.5.创建相机
-  const camera = initPerspectiveCamera({
-    fov: 30,
+  const camera = initOrthographicCamera({
+    s: s,
     position: cameraPos,
     lookAt: cameraTarget
   })
@@ -50,6 +52,9 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
+  // update()函数内会执行camera.lookAt(controls.target)
+  controls.target.copy(cameraTarget)
+  controls.update()
 
   return {
     scene,

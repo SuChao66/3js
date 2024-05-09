@@ -7,6 +7,7 @@ import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-sma
 import moblie from '@/assets/images/examples/moblie.png' // 3D手机
 import BYDSongSmall from '@/assets/images/examples/BYD-song-small.png' // BYD-宋
 import smartCommunitySmall from '@/assets/images/examples/smart-community-small.png' // 智慧小区
+import earthBigScreenSmall from '@/assets/images/examples/3d-earth-small.png' // 地球数据大屏
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -72,7 +73,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 2,
       title: '3D地球可视化',
-      img: inDeveloping,
+      img: earthBigScreenSmall,
       desc: '3D地球可视化',
       path: '3dEarth'
     }

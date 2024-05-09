@@ -5,3 +5,7 @@ declare module '*.vue' {
   const vueComponent: DefineComponent<{}, {}, any>
   export default vueComponent
 }
+
+declare module 'point-in-polygon'
+
+declare module 'delaunator'

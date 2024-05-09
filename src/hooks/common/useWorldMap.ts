@@ -55,7 +55,7 @@ export const useWorldMap = (path: string) => {
   mapGroup.add(lineGroup)
   mapGroup.add(meshGroup)
   // 3.加载world.json数据
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     loader.load(path, (data: any) => {
       // 访问所有国家边界坐标数据：data.features
       data.features.forEach((country: any) => {

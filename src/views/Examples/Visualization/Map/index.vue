@@ -18,15 +18,13 @@ import * as THREE from 'three'
 import Status from 'three/examples/jsm/libs/stats.module'
 // 导入相机控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-// 导入GLTF加载器
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-// 导入draco解压器
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 // 导入hooks
 import { useWindowSize, useStatusByEnv } from '@/hooks'
-import { useThree } from './hook'
+import { useThree, usePolygon, useGridPoint, useDelaunator } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
+// 导入常量
+import { s } from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -41,7 +39,7 @@ const timer = ref<number>(0)
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
-  camera: THREE.PerspectiveCamera, // 相机
+  camera: THREE.OrthographicCamera, // 相机
   renderer: THREE.WebGLRenderer, // 渲染器
   model: THREE.Group, // 模型集合
   status: Status, // 性能监视器
@@ -68,23 +66,25 @@ const init = () => {
 }
 
 // 加载模型
-const initModel = () => {
-  const geometry = new THREE.BoxGeometry(50, 50, 50)
-  const material = new THREE.MeshLambertMaterial({
-    color: 0x00ffff
-  })
-  const mesh = new THREE.Mesh(geometry, material)
+const initModel = async () => {
+  // 0. 初始化model
   model = new THREE.Group()
-  model.add(mesh)
   scene.add(model)
+  // 1.可视化多边形轮廓
+  const lineGroup = usePolygon()
+  model.add(lineGroup)
+  // 2.可视化多边形轮廓点阵
+  const { newPolygonData, group } = useGridPoint()
+  model.add(group)
+  // 3.三角剖分
+  const meshGroup = useDelaunator(newPolygonData)
+  model.add(meshGroup)
+  // 关闭loading
   isLoading.value = false
 }
 
 // 渲染
-const clock = new THREE.Clock()
 const animate = () => {
-  // 时间差
-  const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene, camera)
   // 请求动画帧
@@ -96,9 +96,11 @@ const animate = () => {
 // 监听窗口的变化
 const handleResize = (width: number, height: number) => {
   // 计算相机的aspect
-  const aspect = width / height
+  const k = width / height
   if (camera) {
-    camera.aspect = aspect
+    // 更新相机参数
+    camera.left = -s * k
+    camera.right = s * k
     // 更新相机投影矩阵
     camera.updateProjectionMatrix()
   }

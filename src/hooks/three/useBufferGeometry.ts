@@ -2,17 +2,20 @@ import * as THREE from 'three'
 
 /**
  * 根据顶点坐标创建缓冲几何体
- * @param pointArr
+ * @param pointArr 顶点坐标
+ * @param indexArr 顶点索引
  * @param colorArr 颜色插值
  * @param isVertexColors 是否采用颜色插值
  * @returns
  */
 export const useBufferGeometry = ({
   pointsArr,
+  indexArr,
   colorsArr = [],
   isVertexColors = false
 }: {
   pointsArr: number[]
+  indexArr?: number[]
   colorsArr?: number[]
   isVertexColors?: boolean
 }) => {
@@ -29,6 +32,11 @@ export const useBufferGeometry = ({
     const colors = new Float32Array(colorsArr)
     const colorAttibute = new THREE.BufferAttribute(colors, 3)
     geometry.attributes.color = colorAttibute
+  }
+  // 6.设置几何体的顶点索引值
+  if (indexArr && indexArr?.length > 0) {
+    const indexs = new Uint16Array(indexArr)
+    geometry.index = new THREE.BufferAttribute(indexs, 1)
   }
 
   return geometry
