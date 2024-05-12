@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+// 导入常量
+import { gdpMax } from '../constants'
 
 interface ICountryGdp {
   gdp: number
@@ -13,8 +15,6 @@ export const useCountryGDP = (path: string) => {
   // 定义两个颜色，进行颜色插值，GDP最高对应红色，GDP对应白色
   const color1 = new THREE.Color(0xffffff)
   const color2 = new THREE.Color(0xff0000)
-  // 设置一个基准值,以最高的美国gdp为准
-  const gdpMax = 18219297584000
   // 加载数据
   const loader = new THREE.FileLoader()
   loader.setResponseType('json')

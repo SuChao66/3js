@@ -30,7 +30,7 @@ export const useEarthCountry = (R: number, path: string, isZh = false) => {
           country.geometry.coordinates = [country.geometry.coordinates]
         }
         // 创建国家边界线
-        const line = useCountryLine(R * 1.002, country.geometry.coordinates)
+        const line = useCountryLine(R * 1.003, country.geometry.coordinates)
         const mesh = useCountryMesh(R * 1.002, country.geometry.coordinates)
         earthGroup.add(line)
         earthGroup.add(mesh)

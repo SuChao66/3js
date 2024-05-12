@@ -35,19 +35,19 @@ import {
 } from '@/hooks'
 import {
   useThree,
-  // useEarth,
-  useCountryLine,
   // useEarthAirPortsByTexture,
   // useEarthWay,
-  useEarthCircle,
-  useHotNews,
-  useCountryGDP
+  useEarthCircle
+  // useHotNews,
+  // useCountryGDP,
+  // useGDPPrism,
+  // createPrism
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STag from './components/STag/index.vue'
 // 导入常量
-import { s, earthRadius } from './constants'
+import { s, earthRadius, gdpMax } from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -101,42 +101,53 @@ const initModel = async () => {
   // 1.创建地球
   model = new THREE.Group()
   scene.add(model)
-  // const earth = useEarth()
-  // model.add(earth)
   earth = await useEarthCountry(earthRadius, './data/worldZh.json', true)
   model.add(earth)
-  // 3.加载world.json数据，生成地球边界线
-  const mapGroup = await useCountryLine('./data/worldZh.json')
-  model.add(mapGroup as any)
-  // 4.创建地球光圈
+  // 2.创建地球光圈
   const sprite = useEarthCircle('./images/planets/glow.png')
   model.add(sprite)
-  // 5.可视化全球机场
+
+  // 3.可视化全球机场
   // const airportsGroup = await useEarthAirPorts('./data/airports.json')
   // model.add(airportsGroup as any)
   // const airportsGroup = await useEarthAirPortsByTexture(
   //   './data/airports_small.json'
   // )
   // model.add(airportsGroup as any)
-  // 6.可视化全球公路铁路线
+
+  // 4.可视化全球公路铁路线
   // const earthWayGroup = await useEarthWay('./data/railway.json')
   // model.add(earthWayGroup as any)
-  // 7.标注热点新闻地
-  const meshMap = (await useHotNews('./data/hotNews.json')) as any
-  chooseGroup = meshMap.chooseGroup
-  model.add(meshMap.spriteGroup)
-  // 8.根据GDP显示国家颜色
-  const countryGdpColor = (await useCountryGDP('./data/gdp.json')) as any
-  earth.countryMeshs.forEach((mesh: any) => {
-    if (countryGdpColor[mesh.name]) {
-      mesh.material.color.copy(countryGdpColor[mesh.name].color)
-      mesh.color = countryGdpColor[mesh.name].color
-      mesh.gdp = countryGdpColor[mesh.name].gdp
-    } else {
-      mesh.material.color.set(0xffffff)
-      mesh.color = mesh.material.color.clone()
-    }
-  })
+
+  // 5.标注热点新闻地
+  // const meshMap = (await useHotNews('./data/hotNews.json')) as any
+  // chooseGroup = meshMap.chooseGroup
+  // model.add(meshMap.spriteGroup)
+
+  // 6.根据GDP显示国家颜色，并创建GDP光柱效果
+  // const countryGdpColor = (await useCountryGDP('./data/gdp.json')) as any
+  // const capitalObj = (await useGDPPrism('./data/首都经纬度.json')) as any
+  // earth.countryMeshs.forEach((mesh: any) => {
+  //   if (countryGdpColor[mesh.name]) {
+  //     mesh.material.color.copy(countryGdpColor[mesh.name].color)
+  //     mesh.color = countryGdpColor[mesh.name].color
+  //     mesh.gdp = countryGdpColor[mesh.name].gdp
+  //     // 创建GPD光柱效果
+  //     if (mesh.gdp > gdpMax / 100) {
+  //       const countryGdpPrism = createPrism(
+  //         earthRadius,
+  //         capitalObj[mesh.name][0],
+  //         capitalObj[mesh.name][1],
+  //         mesh.gdp / 100000000000,
+  //         mesh.color
+  //       )
+  //       model.add(countryGdpPrism)
+  //     }
+  //   } else {
+  //     mesh.material.color.set(0xffffff)
+  //     mesh.color = mesh.material.color.clone()
+  //   }
+  // })
   // 结束loading
   isLoading.value = false
 }
@@ -169,7 +180,11 @@ const handleMouseMove = (e: Event) => {
   const { x, y } = usePointer(e)
   // 2.射线拾取
   if (chooseCountry) {
-    chooseCountry.material.color.set(chooseCountry.color)
+    if (chooseCountry.gdp) {
+      chooseCountry.material.color.set(chooseCountry.color)
+    } else {
+      chooseCountry.material.color.set(0x002222)
+    }
     chooseCountry.remove(label)
   }
   chooseCountry = useRayCaster({
@@ -206,7 +221,9 @@ const animate = () => {
   // 更新动画时间
   TWEEN.update()
   // 旋转模型
-  // model.rotateY(0.0015)
+  if (!chooseCountry) {
+    model && model.rotateY(0.0015)
+  }
 }
 
 // 监听窗口的变化
@@ -248,7 +265,7 @@ onMounted(() => {
   // 创建标签
   initLabel()
   // 监听点击事件
-  renderer.domElement.addEventListener('click', handlePointClick)
+  // renderer.domElement.addEventListener('click', handlePointClick)
   // 监听鼠标移动事件
   renderer.domElement.addEventListener('mousemove', handleMouseMove)
 })
@@ -259,7 +276,7 @@ onUnmounted(() => {
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
   // 移除点击事件
-  renderer.domElement.removeEventListener('click', handlePointClick)
+  // renderer.domElement.removeEventListener('click', handlePointClick)
   // 移除鼠标移动事件
   renderer.domElement.addEventListener('mousemove', handleMouseMove)
 })

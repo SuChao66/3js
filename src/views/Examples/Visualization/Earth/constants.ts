@@ -11,3 +11,5 @@ export const s = 120
 // 颜色插值
 export const color1 = new THREE.Color(0x00aaaa)
 export const color2 = new THREE.Color(0x99ffff)
+// 最大GDP
+export const gdpMax = 18219297584000

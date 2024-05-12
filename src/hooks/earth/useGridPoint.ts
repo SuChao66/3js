@@ -7,9 +7,14 @@ import { nested as pointInPolygonNested } from 'point-in-polygon'
  * 生成多边形轮廓点阵
  * @param polygon 边界坐标 [[], [], []....]
  * @param offset 设置均匀填充点的间距
+ * @param isContainEdge 返回的点是否包含边界点
  * @returns 边界坐标和轮廓点阵的并集
  */
-export const useGridPoint = (polygon: number[][], offset: number = 5) => {
+export const useGridPoint = (
+  polygon: number[][],
+  offset: number = 5,
+  isContainEdge: boolean = true
+) => {
   // 0.处理经纬度数据
   const lonArr: number[] = [] // 所有经度数据
   const latArr: number[] = [] // 所有纬度数据
@@ -39,7 +44,12 @@ export const useGridPoint = (polygon: number[][], offset: number = 5) => {
   })
 
   // 3.多边形轮廓边界点和填充点阵的并集
-  const newPolygonData = [...polygon, ...newPointsArr]
+  let newPolygonData
+  if (isContainEdge) {
+    newPolygonData = [...polygon, ...newPointsArr]
+  } else {
+    newPolygonData = newPointsArr
+  }
 
   return newPolygonData
 }
