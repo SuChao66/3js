@@ -52,9 +52,6 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
-  // update()函数内会执行camera.lookAt(controls.target)
-  controls.target.copy(cameraTarget)
-  controls.update()
 
   return {
     scene,

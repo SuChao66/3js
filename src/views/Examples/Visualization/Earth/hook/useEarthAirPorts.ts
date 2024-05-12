@@ -28,7 +28,7 @@ export const useEarthAirPorts = (path: string) => {
           const lon = data[i].longitude_deg // 经度
           const lat = data[i].latitude_deg // 纬度
           // 将经纬度坐标转换为球坐标
-          const { x, y, z } = useLon2xyz(earthRadius * 1.001, lon, lat)
+          const { x, y, z } = useLon2xyz(earthRadius * 1.002, lon, lat)
           vertices.push(x, y, z)
         }
       }

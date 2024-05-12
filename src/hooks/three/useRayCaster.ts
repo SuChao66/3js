@@ -28,8 +28,11 @@ export const useRayCaster = ({
   const intersects = raycaster.intersectObjects(chooseObjArr, true)
 
   let choose = null
+  let point = null
   if (intersects.length > 0) {
-    choose = intersects[0].object
+    point = intersects[0].point
+    choose = intersects[0].object as any
+    choose.point = point
   }
   return choose
 }

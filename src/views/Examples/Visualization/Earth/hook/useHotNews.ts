@@ -24,7 +24,7 @@ export const useHotNews = (path: string) => {
         const hot = data[i].hot // 热度
         // const name = data[i].name // mesh对应新闻name属性 表示新闻发生地点
         // const title = data[i].title // 新闻标题
-        const href = data[i].herf //新闻超链接地址
+        const href = data[i].herf // 新闻超链接地址
         let color
         if (hot > 0.25) {
           color = 0xff4444 // 高热度

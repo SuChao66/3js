@@ -30,7 +30,7 @@ export const useEarthWay = (path: string) => {
           const pointsArr: number[] = []
           arr.forEach((elem: number[]) => {
             // 经纬度转球面坐标
-            const coord = useLon2xyz(earthRadius, elem[0], elem[1])
+            const coord = useLon2xyz(earthRadius * 1.002, elem[0], elem[1])
             pointsArr.push(coord.x, coord.y, coord.z)
           })
           // 处理顶点数据适合LineSegments连续渲染所有独立不相连轨迹线

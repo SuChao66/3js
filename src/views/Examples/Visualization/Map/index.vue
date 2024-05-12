@@ -19,8 +19,8 @@ import Status from 'three/examples/jsm/libs/stats.module'
 // 导入相机控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入hooks
-import { useWindowSize, useStatusByEnv } from '@/hooks'
-import { useThree, usePolygon, useGridPoint, useDelaunator } from './hook'
+import { useWindowSize, useStatusByEnv, useEarthCountry } from '@/hooks'
+import { useThree } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 // 导入常量
@@ -70,16 +70,10 @@ const initModel = async () => {
   // 0. 初始化model
   model = new THREE.Group()
   scene.add(model)
-  // 1.可视化多边形轮廓
-  const lineGroup = usePolygon()
-  model.add(lineGroup)
-  // 2.可视化多边形轮廓点阵
-  const { newPolygonData, group } = useGridPoint()
-  model.add(group)
-  // 3.三角剖分
-  const meshGroup = useDelaunator(newPolygonData)
-  model.add(meshGroup)
-  // 关闭loading
+  // 1.创建地球
+  const earth = (await useEarthCountry(100, './data/world.json')) as any
+  model.add(earth)
+
   isLoading.value = false
 }
 

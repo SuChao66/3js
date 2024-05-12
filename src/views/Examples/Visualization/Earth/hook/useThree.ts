@@ -7,7 +7,8 @@ import {
   useStatus,
   useRenderer,
   useControls,
-  useAxesHelper
+  useAxesHelper,
+  useCSS2DRenderer
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget, s } from '../constants'
@@ -52,12 +53,15 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
+  // 1.9.css2Drenderer渲染器
+  const css2Renderer = useCSS2DRenderer()
 
   return {
     scene,
     camera,
     renderer,
     controls,
-    status
+    status,
+    css2Renderer
   }
 }

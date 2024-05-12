@@ -42,7 +42,7 @@ export const useLightPillar = ({
   const group = new THREE.Group()
   group.add(mesh, mesh.clone().rotateZ(Math.PI / 2))
   // 3.经纬度转球面坐标，将精灵图设置在地球表面
-  const { x, y, z } = useLon2xyz(earthRadius, lon, lat)
+  const { x, y, z } = useLon2xyz(earthRadius * 1.002, lon, lat)
   group.position.set(x, y, z)
   // 4.设置精灵图的角度
   // mesh在球面上的法线方向(球心和球面坐标构成的方向向量)
