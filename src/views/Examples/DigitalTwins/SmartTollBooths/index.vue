@@ -185,7 +185,7 @@ watch(
             })
           }, 6000)
         }, 1000)
-      }, 3000)
+      }, 8000)
     }
   },
   { immediate: true, deep: true }

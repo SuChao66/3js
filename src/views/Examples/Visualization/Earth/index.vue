@@ -37,11 +37,12 @@ import {
   useThree,
   // useEarthAirPortsByTexture,
   // useEarthWay,
-  useEarthCircle
+  useEarthCircle,
   // useHotNews,
   // useCountryGDP,
   // useGDPPrism,
   // createPrism
+  usePopulationDensity
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
@@ -148,6 +149,12 @@ const initModel = async () => {
   //     mesh.color = mesh.material.color.clone()
   //   }
   // })
+
+  // 7.初始化人口密度
+  const group = (await usePopulationDensity(
+    './data/population_density.json'
+  )) as any
+  model.add(group)
   // 结束loading
   isLoading.value = false
 }
@@ -265,7 +272,7 @@ onMounted(() => {
   // 创建标签
   initLabel()
   // 监听点击事件
-  // renderer.domElement.addEventListener('click', handlePointClick)
+  renderer.domElement.addEventListener('click', handlePointClick)
   // 监听鼠标移动事件
   renderer.domElement.addEventListener('mousemove', handleMouseMove)
 })
@@ -276,7 +283,7 @@ onUnmounted(() => {
   // 取消请求动画帧
   cancelAnimationFrame(timer.value)
   // 移除点击事件
-  // renderer.domElement.removeEventListener('click', handlePointClick)
+  renderer.domElement.removeEventListener('click', handlePointClick)
   // 移除鼠标移动事件
   renderer.domElement.addEventListener('mousemove', handleMouseMove)
 })
