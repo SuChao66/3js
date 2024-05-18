@@ -19,12 +19,19 @@ import Status from 'three/examples/jsm/libs/stats.module'
 // 导入相机控制器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入hooks
-import { useWindowSize, useStatusByEnv, useEarthCountry } from '@/hooks'
+import {
+  useWindowSize,
+  useStatusByEnv,
+  useEarthSphere,
+  // useEarthCountry,
+  useArcFlyPath
+} from '@/hooks'
 import { useThree } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 // 导入常量
 import { s } from './constants'
+import { earthRadius } from '../Earth/constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -71,8 +78,50 @@ const initModel = async () => {
   model = new THREE.Group()
   scene.add(model)
   // 1.创建地球
-  const earth = (await useEarthCountry(100, './data/world.json')) as any
+  // const earth = (await useEarthCountry({
+  //   R: earthRadius,
+  //   path: './data/world.json',
+  //   opacity: 0.3,
+  //   transparent: true
+  // })) as any
+  // model.add(earth)
+  // 2.创建轨迹线
+  // const start = [112.45, 34.62]
+  // const end = [12.6, 41.9]
+  // const { help, flyPath } = useBezierFlyPath({
+  //   R: earthRadius,
+  //   start,
+  //   end,
+  //   isHelp: true
+  // })
+  // model.add(help, flyPath)
+
+  const earth = useEarthSphere({
+    R: earthRadius,
+    transparent: true,
+    opacity: 0.5
+  })
   model.add(earth)
+  const position = earth.geometry.attributes.position
+  // 起点
+  const startPoint = new THREE.Vector3(
+    position.getX(100),
+    position.getY(100),
+    position.getZ(100)
+  )
+  // 终点
+  const endPoint = new THREE.Vector3(
+    position.getX(1000),
+    position.getY(1000),
+    position.getZ(1000)
+  )
+  const line = useArcFlyPath({
+    R: earthRadius,
+    startPoint,
+    endPoint,
+    model
+  })
+  model.add(line)
 
   isLoading.value = false
 }

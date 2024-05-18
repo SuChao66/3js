@@ -7,7 +7,19 @@ import { useEarthSphere, useCountryLine, useCountryMesh } from '@/hooks'
  * 国家球面版图设计：根据经纬度坐标进行三角面剖分，创建网格模型
  * @param path
  */
-export const useEarthCountry = (R: number, path: string, isZh = false) => {
+export const useEarthCountry = ({
+  R,
+  path,
+  isZh = false,
+  opacity = 1,
+  transparent = false
+}: {
+  R: number
+  path: string
+  isZh?: boolean
+  opacity?: number
+  transparent?: boolean
+}) => {
   // 1.创建文件加载器
   const loader = new THREE.FileLoader()
   // 设置loader请求的响应类型
@@ -15,7 +27,7 @@ export const useEarthCountry = (R: number, path: string, isZh = false) => {
   // 2.定义组对象
   const earthGroup = new THREE.Group() as any
   // 3.创建地球
-  const earth = useEarthSphere({ R })
+  const earth = useEarthSphere({ R, opacity, transparent })
   earthGroup.add(earth)
   // 4.创建国家网格模型数组
   const countryMeshs: THREE.Mesh[] = []

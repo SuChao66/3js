@@ -102,7 +102,11 @@ const initModel = async () => {
   // 1.创建地球
   model = new THREE.Group()
   scene.add(model)
-  earth = await useEarthCountry(earthRadius, './data/worldZh.json', true)
+  earth = await useEarthCountry({
+    R: earthRadius,
+    path: './data/worldZh.json',
+    isZh: true
+  })
   model.add(earth)
   // 2.创建地球光圈
   const sprite = useEarthCircle('./images/planets/glow.png')
