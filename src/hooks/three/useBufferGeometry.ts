@@ -27,7 +27,7 @@ export const useBufferGeometry = ({
   const positionsAttibute = new THREE.BufferAttribute(vertices, 3)
   // 4.设置缓冲几何体的attributes属性的位置属性
   geometry.attributes.position = positionsAttibute
-  // 5.判断是否彩英颜色插值算法
+  // 5.判断是否采用颜色插值算法
   if (isVertexColors) {
     const colors = new Float32Array(colorsArr)
     const colorAttibute = new THREE.BufferAttribute(colors, 3)

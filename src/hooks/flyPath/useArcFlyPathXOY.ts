@@ -4,27 +4,36 @@ import {
   useSphere,
   useRadianAOB,
   useThreePointCenter,
-  useArcLine
+  useArcLine,
+  useFlyLine
 } from '@/hooks'
 
 /**
  * 二维平面上创建飞线
  * 使用arcCurve圆弧实现
+ * @param R 地球半径
  * @param startPoint 起点
  * @param endPoint 终点
+ * @param isHelp 是否可视化绘制过程
+ * @param N 曲线分段数
+ * @param flyAngleNum 飞线弧度分段数
  */
 export const useArcFlyPathXOY = ({
   R,
   startPoint,
   endPoint,
   isHelp = false,
-  color
+  color,
+  N,
+  flyAngleNum = 7
 }: {
   R: number
   startPoint: THREE.Vector3
   endPoint: THREE.Vector3
   isHelp?: boolean
   color?: number
+  N?: number
+  flyAngleNum?: number
 }) => {
   const help = new THREE.Group()
   // 球心
@@ -101,8 +110,25 @@ export const useArcFlyPathXOY = ({
     r: flyArcR,
     startAngle: startAngle,
     endAngle: endAngle,
-    color
-  })
+    color,
+    N
+  }) as any
+  // 给圆弧轨迹线绑定圆弧坐标、中间点坐标
+  line.center = flyArcCenter
+  line.topCoord = arcTopCoord
+  // 飞线圆弧的弧度和轨迹线弧度相关
+  const flyAngle = (endAngle - startAngle) / flyAngleNum
+  // 绘制一段飞线, 圆心做坐标原点
+  const flyLine = useFlyLine(flyArcR, startAngle, startAngle + flyAngle) as any
+  // 平移飞线圆弧和飞线轨迹圆弧重合
+  flyLine.position.y = flyArcCenter.y
+  // 飞线段flyLine作为飞线轨迹arcLine子对象，继承飞线轨迹平移旋转等变换
+  line.add(flyLine)
+  // 飞线段运动范围startAngle ~ flyEndAngle
+  flyLine.flyEndAngle = endAngle - startAngle - flyAngle
+  flyLine.startAngle = startAngle
+  // arcline.flyLine指向飞线段,便于设置动画
+  line.flyLine = flyLine
 
   return {
     help,

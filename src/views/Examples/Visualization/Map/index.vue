@@ -1,5 +1,5 @@
 <template>
-  <div class="mobile">
+  <div class="map">
     <!-- 性能监视器 -->
     <div ref="statusRef"></div>
     <!-- 加载动画 -->
@@ -22,9 +22,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import {
   useWindowSize,
   useStatusByEnv,
-  useEarthSphere,
-  // useEarthCountry,
-  useArcFlyPath
+  useEarthCountry,
+  useArcFlyPath,
+  useLon2xyz
 } from '@/hooks'
 import { useThree } from './hook'
 // 导入组件
@@ -32,6 +32,8 @@ import SLoading from '@/baseui/SLoading/index.vue'
 // 导入常量
 import { s } from './constants'
 import { earthRadius } from '../Earth/constants'
+// 导入数据
+import data from './data/data.js'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -43,6 +45,8 @@ const isLoading = ref<boolean>(true)
 const currentProgress = ref<number>(0)
 // 请求动画帧
 const timer = ref<number>(0)
+// 飞线段数组
+let flyLineArr: any[] = []
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -78,51 +82,33 @@ const initModel = async () => {
   model = new THREE.Group()
   scene.add(model)
   // 1.创建地球
-  // const earth = (await useEarthCountry({
-  //   R: earthRadius,
-  //   path: './data/world.json',
-  //   opacity: 0.3,
-  //   transparent: true
-  // })) as any
-  // model.add(earth)
-  // 2.创建轨迹线
-  // const start = [112.45, 34.62]
-  // const end = [12.6, 41.9]
-  // const { help, flyPath } = useBezierFlyPath({
-  //   R: earthRadius,
-  //   start,
-  //   end,
-  //   isHelp: true
-  // })
-  // model.add(help, flyPath)
-
-  const earth = useEarthSphere({
+  const earth = (await useEarthCountry({
     R: earthRadius,
-    transparent: true,
-    opacity: 0.5
-  })
+    path: './data/world.json'
+    // opacity: 0.3,
+    // transparent: true
+  })) as any
   model.add(earth)
-  const position = earth.geometry.attributes.position
-  // 起点
-  const startPoint = new THREE.Vector3(
-    position.getX(100),
-    position.getY(100),
-    position.getZ(100)
-  )
-  // 终点
-  const endPoint = new THREE.Vector3(
-    position.getX(1000),
-    position.getY(1000),
-    position.getZ(1000)
-  )
-  const line = useArcFlyPath({
-    R: earthRadius,
-    startPoint,
-    endPoint,
-    model
+  // 2.绘制飞线
+  const flyPathGroup = new THREE.Group()
+  const start = data.start
+  const { x, y, z } = useLon2xyz(earthRadius, start.E, start.N)
+  const startPoint = new THREE.Vector3(x, y, z)
+  data.endArr.forEach((cood: any) => {
+    const { x, y, z } = useLon2xyz(earthRadius, cood.E, cood.N)
+    const endPoint = new THREE.Vector3(x, y, z)
+    const { line } = useArcFlyPath({
+      R: earthRadius,
+      startPoint,
+      endPoint,
+      model
+    })
+    flyPathGroup.add(line)
+    flyLineArr.push(line.flyLine)
   })
-  model.add(line)
+  model.add(flyPathGroup)
 
+  // 关闭loading
   isLoading.value = false
 }
 
@@ -134,6 +120,13 @@ const animate = () => {
   timer.value = requestAnimationFrame(animate)
   // 更新性能监视器
   status && status.update()
+  // 动态更新飞线的角度
+  flyLineArr.forEach((flyLine) => {
+    flyLine.rotation.z += 0.02
+    if (flyLine.rotation.z >= flyLine.flyEndAngle) {
+      flyLine.rotation.z = flyLine.startAngle
+    }
+  })
 }
 
 // 监听窗口的变化
@@ -178,4 +171,6 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+@import './index.less';
+</style>

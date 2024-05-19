@@ -60,6 +60,7 @@ export * from './earth/useCountryPoint'
 export * from './earth/useEarthCountry'
 // 飞线
 export * from './flyPath/useBezierFlyPath'
+export * from './flyPath/useFlyLine'
 export * from './flyPath/use3DTo2D'
 export * from './flyPath/useArcFlyPathXOY'
 export * from './flyPath/useArcFlyPath'
