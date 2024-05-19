@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 // 导入hook
-import { use3DTo2D, useArcFlyPathXOY, useLine } from '@/hooks'
-// 导入常量
-import { LineType } from '@/enums'
+import { use3DTo2D, useArcFlyPathXOY } from '@/hooks'
 
 /**
  * 绘制空间中两点之间的飞线

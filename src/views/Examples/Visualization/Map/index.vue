@@ -26,7 +26,7 @@ import {
   useArcFlyPath,
   useLon2xyz
 } from '@/hooks'
-import { useThree } from './hook'
+import { useThree, usePointMesh, useWaveMesh, useConeMesh } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 // 导入常量
@@ -46,7 +46,9 @@ const currentProgress = ref<number>(0)
 // 请求动画帧
 const timer = ref<number>(0)
 // 飞线段数组
-let flyLineArr: any[] = []
+const flyLineArr: any[] = []
+// 波动光圈数组
+const waveMeshArr: THREE.Mesh[] = []
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -54,7 +56,8 @@ let scene: THREE.Scene, // 场景
   renderer: THREE.WebGLRenderer, // 渲染器
   model: THREE.Group, // 模型集合
   status: Status, // 性能监视器
-  controls: OrbitControls // 相机控制器
+  controls: OrbitControls, // 相机控制器
+  ConeMesh: THREE.Mesh // 棱锥
 
 // 初始化
 const init = () => {
@@ -85,17 +88,34 @@ const initModel = async () => {
   const earth = (await useEarthCountry({
     R: earthRadius,
     path: './data/world.json'
-    // opacity: 0.3,
-    // transparent: true
   })) as any
   model.add(earth)
   // 2.绘制飞线
   const flyPathGroup = new THREE.Group()
   const start = data.start
+  // 转化开始点坐标为球面坐标
   const { x, y, z } = useLon2xyz(earthRadius, start.E, start.N)
   const startPoint = new THREE.Vector3(x, y, z)
+  // 静态圆点平面
+  const startMesh = usePointMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(startMesh)
+  // 波动光圈
+  const startWaveMesh = useWaveMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(startWaveMesh)
+  waveMeshArr.push(startWaveMesh)
+  // 创建棱柱爱，标注起点
+  ConeMesh = useConeMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(ConeMesh)
   data.endArr.forEach((cood: any) => {
     const { x, y, z } = useLon2xyz(earthRadius, cood.E, cood.N)
+    // 静态圆点平面
+    const endMesh = usePointMesh(earthRadius, cood.E, cood.N)
+    flyPathGroup.add(endMesh)
+    // 波动光圈
+    const endWaveMesh = useWaveMesh(earthRadius, cood.E, cood.N)
+    flyPathGroup.add(endWaveMesh)
+    waveMeshArr.push(endWaveMesh)
+    // 绘制飞线
     const endPoint = new THREE.Vector3(x, y, z)
     const { line } = useArcFlyPath({
       R: earthRadius,
@@ -127,6 +147,28 @@ const animate = () => {
       flyLine.rotation.z = flyLine.startAngle
     }
   })
+  // 波动光圈动画
+  if (waveMeshArr.length) {
+    waveMeshArr.forEach((mesh: any) => {
+      mesh._s += 0.007
+      mesh.scale.set(
+        mesh.size * mesh._s,
+        mesh.size * mesh._s,
+        mesh.size * mesh._s
+      )
+      if (mesh._s <= 1.5) {
+        mesh.material.opacity = (mesh._s - 1) * 2
+      } else if (mesh._s > 1.5 && mesh._s <= 2) {
+        mesh.material.opacity = 1 - (mesh._s - 1.5) * 2
+      } else {
+        mesh._s = 1.0
+      }
+    })
+  }
+  // 棱锥转动
+  if (ConeMesh) {
+    ConeMesh.rotateZ(-0.02)
+  }
 }
 
 // 监听窗口的变化
