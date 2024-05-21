@@ -31,7 +31,9 @@ import {
   usePointer,
   useRayCaster,
   useEarthCountry,
-  useCSS2DObject
+  useCSS2DObject,
+  useArcFlyPath,
+  useLon2xyz
 } from '@/hooks'
 import {
   useThree,
@@ -42,13 +44,18 @@ import {
   // useCountryGDP,
   // useGDPPrism,
   // createPrism
-  usePopulationDensity
+  // usePopulationDensity
+  usePointMesh,
+  useWaveMesh,
+  useConeMesh
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STag from './components/STag/index.vue'
 // 导入常量
 import { s, earthRadius, gdpMax } from './constants'
+// 导入数据
+import data from './data/data.js'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -62,6 +69,10 @@ const isLoading = ref<boolean>(true)
 const currentProgress = ref<number>(0)
 // 请求动画帧
 const timer = ref<number>(0)
+// 波动光圈
+let waveMeshArr: THREE.Mesh[] = []
+// 飞线
+let flyLineArr: any[] = []
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -73,7 +84,8 @@ let scene: THREE.Scene, // 场景
   earth: any, // 地球模型
   chooseCountry: any, // 当前选中的国家
   label: any, // 国家标签
-  chooseGroup: THREE.Group // 光圈底座
+  chooseGroup: THREE.Group, // 光圈底座
+  ConeMesh: THREE.Mesh
 
 // 初始化
 const init = () => {
@@ -155,10 +167,48 @@ const initModel = async () => {
   // })
 
   // 7.初始化人口密度
-  const group = (await usePopulationDensity(
-    './data/population_density.json'
-  )) as any
-  model.add(group)
+  // const group = (await usePopulationDensity(
+  //   './data/population_density.json'
+  // )) as any
+  // model.add(group)
+
+  // 8.绘制飞线
+  const flyPathGroup = new THREE.Group()
+  const start = data.start
+  // 转化开始点坐标为球面坐标
+  const { x, y, z } = useLon2xyz(earthRadius, start.E, start.N)
+  const startPoint = new THREE.Vector3(x, y, z)
+  // 静态圆点平面
+  const startMesh = usePointMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(startMesh)
+  // 波动光圈
+  const startWaveMesh = useWaveMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(startWaveMesh)
+  waveMeshArr.push(startWaveMesh)
+  // 创建棱柱爱，标注起点
+  ConeMesh = useConeMesh(earthRadius, start.E, start.N)
+  flyPathGroup.add(ConeMesh)
+  data.endArr.forEach((cood: any) => {
+    const { x, y, z } = useLon2xyz(earthRadius, cood.E, cood.N)
+    // 静态圆点平面
+    const endMesh = usePointMesh(earthRadius, cood.E, cood.N)
+    flyPathGroup.add(endMesh)
+    // 波动光圈
+    const endWaveMesh = useWaveMesh(earthRadius, cood.E, cood.N)
+    flyPathGroup.add(endWaveMesh)
+    waveMeshArr.push(endWaveMesh)
+    // 绘制飞线
+    const endPoint = new THREE.Vector3(x, y, z)
+    const { line } = useArcFlyPath({
+      R: earthRadius,
+      startPoint,
+      endPoint,
+      model
+    })
+    flyPathGroup.add(line)
+    flyLineArr.push(line.flyLine)
+  })
+  model.add(flyPathGroup)
   // 结束loading
   isLoading.value = false
 }
@@ -234,6 +284,35 @@ const animate = () => {
   // 旋转模型
   if (!chooseCountry) {
     model && model.rotateY(0.0015)
+  }
+  // 动态更新飞线的角度
+  flyLineArr.forEach((flyLine) => {
+    flyLine.rotation.z += 0.02
+    if (flyLine.rotation.z >= flyLine.flyEndAngle) {
+      flyLine.rotation.z = flyLine.startAngle
+    }
+  })
+  // 波动光圈动画
+  if (waveMeshArr.length) {
+    waveMeshArr.forEach((mesh: any) => {
+      mesh._s += 0.007
+      mesh.scale.set(
+        mesh.size * mesh._s,
+        mesh.size * mesh._s,
+        mesh.size * mesh._s
+      )
+      if (mesh._s <= 1.5) {
+        mesh.material.opacity = (mesh._s - 1) * 2
+      } else if (mesh._s > 1.5 && mesh._s <= 2) {
+        mesh.material.opacity = 1 - (mesh._s - 1.5) * 2
+      } else {
+        mesh._s = 1.0
+      }
+    })
+  }
+  // 棱锥转动
+  if (ConeMesh) {
+    ConeMesh.rotateZ(-0.02)
   }
 }
 
