@@ -185,7 +185,7 @@ const initModel = async () => {
   const startWaveMesh = useWaveMesh(earthRadius, start.E, start.N)
   flyPathGroup.add(startWaveMesh)
   waveMeshArr.push(startWaveMesh)
-  // 创建棱柱爱，标注起点
+  // 创建棱柱，标注起点
   ConeMesh = useConeMesh(earthRadius, start.E, start.N)
   flyPathGroup.add(ConeMesh)
   data.endArr.forEach((cood: any) => {

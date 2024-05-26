@@ -7,10 +7,11 @@ import {
   useStatus,
   useRenderer,
   useControls,
-  useAxesHelper
+  useAxesHelper,
+  useCSS2DRenderer
 } from '@/hooks'
 // 导入常量
-import { cameraPos, cameraTarget, s } from '../constants'
+import { cameraPos, cameraTarget, s, mapSize } from '../constants'
 
 export const useThree = (canvas: HTMLCanvasElement) => {
   const { initAmbientLight, initDirectionalLight } = useLights()
@@ -40,7 +41,8 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   const camera = initOrthographicCamera({
     s: s,
     position: cameraPos,
-    lookAt: cameraTarget
+    lookAt: cameraTarget,
+    far: mapSize * 10
   })
   // 1.6.创建渲染器
   const renderer = useRenderer(canvas)
@@ -52,12 +54,15 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
+  // 1.9.css2Drenderer渲染器
+  const css2Renderer = useCSS2DRenderer()
 
   return {
     scene,
     camera,
     renderer,
     controls,
-    status
+    status,
+    css2Renderer
   }
 }
