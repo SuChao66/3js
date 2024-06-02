@@ -2,7 +2,16 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const VisualizationRoutes: Array<RouteRecordRaw> = [
-  // 1.3D地图可视化
+  // 1.全球GDP可视化
+  {
+    name: 'GDP',
+    path: '/gdp',
+    meta: {
+      title: '3dGDP'
+    },
+    component: () => import('@/views/Examples/Visualization/GDP/index.vue')
+  },
+  // 2.地图可视化
   {
     name: '3dMap',
     path: '/3dMap',
@@ -11,7 +20,17 @@ const VisualizationRoutes: Array<RouteRecordRaw> = [
     },
     component: () => import('@/views/Examples/Visualization/Map/index.vue')
   },
-  // 2.3D地球可视化
+  // 3.全球人口可视化
+  {
+    name: '3dPopulation',
+    path: '/3dPopulation',
+    meta: {
+      title: '3dPopulation'
+    },
+    component: () =>
+      import('@/views/Examples/Visualization/PopulationDensity/index.vue')
+  },
+  // 2.全球航班地球可视化
   {
     name: '3dEarth',
     path: '/3dEarth',

@@ -19,7 +19,6 @@
 <script setup lang="ts">
 import smartFactory from '@/assets/images/swiper/smart-factory.png'
 import smartTollBooths from '@/assets/images/swiper/smart-toll-booths.png'
-import earthBigScreen from '@/assets/images/swiper/3d-earth.png'
 // 导入类型
 import type { IProps } from './types'
 // 导入路由
@@ -34,10 +33,6 @@ const props = withDefaults(defineProps<IProps>(), {
 const { height } = toRefs(props)
 
 const images = [
-  {
-    url: earthBigScreen,
-    path: '3dEarth'
-  },
   {
     url: smartFactory,
     path: 'SmartFactory'

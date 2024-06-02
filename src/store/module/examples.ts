@@ -8,6 +8,9 @@ import moblie from '@/assets/images/examples/moblie.png' // 3D手机
 import BYDSongSmall from '@/assets/images/examples/BYD-song-small.png' // BYD-宋
 import smartCommunitySmall from '@/assets/images/examples/smart-community-small.png' // 智慧小区
 import earthBigScreenSmall from '@/assets/images/examples/3d-earth-small.png' // 地球数据大屏
+import GDP from '@/assets/images/examples/3d-gdp-small.png' // GDP数据大屏
+import population from '@/assets/images/examples/3d-population-small.png' // 人口密度数据大屏
+import map from '@/assets/images/examples/3d-map-small.png' // 人口密度数据大屏
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -65,13 +68,27 @@ const useExampleStore = defineStore('examples', () => {
   const visualizationExamples = reactive<ICard[]>([
     {
       key: 1,
+      title: '全球GDP可视化',
+      img: GDP,
+      desc: '3D全球GDP可视化',
+      path: 'GDP'
+    },
+    {
+      key: 2,
       title: '3D地图可视化',
-      img: inDeveloping,
+      img: map,
       desc: '3D地图可视化',
       path: '3dMap'
     },
     {
-      key: 2,
+      key: 3,
+      title: '全球人口可视化',
+      img: population,
+      desc: '3D全球人口可视化',
+      path: '3dPopulation'
+    },
+    {
+      key: 4,
       title: '3D地球可视化',
       img: earthBigScreenSmall,
       desc: '3D地球可视化',

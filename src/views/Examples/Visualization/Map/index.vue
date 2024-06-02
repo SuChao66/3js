@@ -1,9 +1,11 @@
 <template>
   <div class="map">
     <!-- 顶部 -->
-    <SBigScreenHeader title="全国航班实时大屏" />
+    <SBigScreenHeader title="全国微博签到实时大屏" />
     <!-- 性能监视器 -->
     <div ref="statusRef"></div>
+    <!-- 图表 -->
+    <SCharts v-if="!isLoading" />
     <!-- 加载动画 -->
     <transition name="fade">
       <SLoading v-if="isLoading" :currentProgress="currentProgress" />
@@ -36,17 +38,17 @@ import {
   useSprite,
   useCSS2DObject,
   usePointer,
-  useRayCaster,
-  useLon2Mercator,
-  useCatmullRomFlyPath
+  useRayCaster
+  // useLon2Mercator,
+  // useCatmullRomFlyPath
 } from '@/hooks'
 import {
   useThree,
   useProvince,
   useProvinceCircle,
   useConeMesh,
-  useProvinceLabel,
-  useGDPPrism,
+  // useProvinceLabel,
+  // useGDPPrism,
   useProvinceGDP,
   useWeiBo
 } from './hook'
@@ -54,6 +56,7 @@ import {
 import SLoading from '@/baseui/SLoading/index.vue'
 import SBigScreenHeader from '@/baseui/SBigScreenHeader/index.vue'
 import STag from './components/STag/index.vue'
+import SCharts from './components/SCharts/index.vue'
 // 导入常量
 import { s, mapSize } from './constants'
 
@@ -113,12 +116,12 @@ const initModel = async () => {
   model = new THREE.Group()
   scene.add(model)
   // 1.世界地图
-  // const mapGroup = (await useCountryMap({
+  // const { mapGroup } = (await useCountryMap({
   //   path: './data/GeoJSON数据/world.json',
   //   mapSize: mapSize,
   //   height: mapSize * 0.02 // 拉伸高度
   // })) as any
-  // model.add(mapGroup)
+  // console.log(mapGroup)
 
   // 2.中国地图
   // const mapGroup = (await useCountryMap({
@@ -188,25 +191,25 @@ const initModel = async () => {
   })
 
   // 微博数据可视化
-  // const weiBoPoints = (await useWeiBo({
-  //   path: './data/全国微博签到数据.json',
-  //   mapSize: mapSize
-  // })) as any
+  const weiBoPoints = (await useWeiBo({
+    path: './data/全国微博签到数据.json',
+    mapSize: mapSize
+  })) as any
 
   // 飞线设置
-  const line = useCatmullRomFlyPath({
-    start: [120.153576, 30.287459],
-    end: [103.823557, 36.058039],
-    isAnimation: true
-  })
-  line.position.z += mapSize * 0.02
-  model.add(line)
+  // const line = useCatmullRomFlyPath({
+  //   start: [120.153576, 30.287459],
+  //   end: [103.823557, 36.058039],
+  //   isAnimation: true
+  // })
+  // line.position.z += mapSize * 0.02
+  // model.add(line)
 
   model.add(mapGroup)
   model.add(provinceGroup)
   model.add(provinceCircleGroup)
   model.add(coneMesh)
-  // model.add(weiBoPoints)
+  model.add(weiBoPoints)
   // model.add(provinceLabelGroup)
 
   // 4.河南

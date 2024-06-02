@@ -1,0 +1,35 @@
+.charts {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  .box {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .chart {
+    width: 100%;
+    height: 250px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+}
+
+.left {
+  left: 20px;
+  top: 100px;
+  bottom: 20px;
+  width: 350px;
+}
+
+.right {
+  right: 20px;
+  top: 100px;
+  bottom: 20px;
+  width: 350px;
+}
