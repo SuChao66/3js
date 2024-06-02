@@ -8,7 +8,8 @@ import {
   useRenderer,
   useControls,
   useAxesHelper,
-  useCSS2DRenderer
+  useCSS2DRenderer,
+  useTexture
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget, s, mapSize } from '../constants'
@@ -20,7 +21,11 @@ export const useThree = (canvas: HTMLCanvasElement) => {
 
   // 1.1.创建场景
   const scene = useScene()
-  scene.background = new THREE.Color(0x000000)
+  // 设置背景纹理
+  const texture = useTexture({
+    path: './images/bg/bg1.jpg'
+  })
+  scene.background = texture
   // 箭头辅助器
   useAxesHelper({ size: 120, scene: scene })
   // 1.4.设置光源
