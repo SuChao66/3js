@@ -1,7 +1,7 @@
 <template>
   <div class="map">
     <!-- 顶部 -->
-    <SBigScreenHeader title="全国微博签到实时大屏" />
+    <SBigScreenHeader v-if="!isLoading" title="全国微博签到实时大屏" />
     <!-- 性能监视器 -->
     <div ref="statusRef"></div>
     <!-- 图表 -->

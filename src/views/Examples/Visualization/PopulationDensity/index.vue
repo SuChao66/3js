@@ -1,7 +1,7 @@
 <template>
   <div class="earth">
     <!-- 顶部标题 -->
-    <SBigScreenHeader title="全球人口密度可视化" />
+    <SBigScreenHeader v-if="!isLoading" title="全球人口密度可视化" />
     <!-- 图表 -->
     <SCharts v-if="!isLoading" />
     <!-- 性能监视器 -->

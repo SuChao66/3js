@@ -1,7 +1,7 @@
 <template>
   <div class="earth">
     <!-- 顶部标题 -->
-    <SBigScreenHeader title="全球GDP可视化大屏" />
+    <SBigScreenHeader v-if="!isLoading" title="全球GDP可视化大屏" />
     <!-- 图表 -->
     <SCharts v-if="!isLoading" />
     <!-- 性能监视器 -->
