@@ -7,7 +7,7 @@ import {
   useStatus,
   useRenderer,
   useControls,
-  useAxesHelper,
+  // useAxesHelper,
   useCSS2DRenderer,
   useTexture
 } from '@/hooks'
@@ -23,11 +23,11 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   const scene = useScene()
   // 设置背景纹理
   const texture = useTexture({
-    path: './images/bg/bg2.png'
+    path: './images/bg/bg3.png'
   })
   scene.background = texture
   // 箭头辅助器
-  useAxesHelper({ size: 200, scene: scene })
+  // useAxesHelper({ size: 200, scene: scene })
   // 1.4.设置光源
   initAmbientLight({ scene, density: 0.6 })
   initDirectionalLight({

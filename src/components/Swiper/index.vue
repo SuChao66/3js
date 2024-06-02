@@ -29,7 +29,7 @@ const router = useRouter()
 
 // 0.定义props
 const props = withDefaults(defineProps<IProps>(), {
-  height: '450px'
+  height: '500px'
 })
 const { height } = toRefs(props)
 

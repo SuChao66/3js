@@ -1,5 +1,9 @@
 <template>
-  <div class="mobile">
+  <div class="earth">
+    <!-- 顶部标题 -->
+    <SBigScreenHeader title="全球航班可视化大屏" />
+    <!-- 图表 -->
+    <SCharts v-if="!isLoading" />
     <!-- 性能监视器 -->
     <div ref="statusRef"></div>
     <!-- 加载动画 -->
@@ -40,18 +44,20 @@ import {
   // useEarthAirPortsByTexture,
   // useEarthWay,
   useEarthCircle,
-  // useHotNews,
+  useHotNews,
   // useCountryGDP,
   // useGDPPrism,
-  // createPrism
-  // usePopulationDensity
+  // createPrism,
+  // usePopulationDensity,
   usePointMesh,
   useWaveMesh,
   useConeMesh
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
+import SBigScreenHeader from '@/baseui/SBigScreenHeader/index.vue'
 import STag from './components/STag/index.vue'
+import SCharts from './components/SCharts/index.vue'
 // 导入常量
 import { s, earthRadius, gdpMax } from './constants'
 // 导入数据
@@ -137,9 +143,9 @@ const initModel = async () => {
   // model.add(earthWayGroup as any)
 
   // 5.标注热点新闻地
-  // const meshMap = (await useHotNews('./data/hotNews.json')) as any
-  // chooseGroup = meshMap.chooseGroup
-  // model.add(meshMap.spriteGroup)
+  const meshMap = (await useHotNews('./data/hotNews.json')) as any
+  chooseGroup = meshMap.chooseGroup
+  model.add(meshMap.spriteGroup)
 
   // 6.根据GDP显示国家颜色，并创建GDP光柱效果
   // const countryGdpColor = (await useCountryGDP('./data/gdp.json')) as any
@@ -372,4 +378,6 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+@import './index.less';
+</style>

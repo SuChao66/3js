@@ -1,5 +1,7 @@
 <template>
   <div class="map">
+    <!-- 顶部 -->
+    <SBigScreenHeader title="全国航班实时大屏" />
     <!-- 性能监视器 -->
     <div ref="statusRef"></div>
     <!-- 加载动画 -->
@@ -50,6 +52,7 @@ import {
 } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
+import SBigScreenHeader from '@/baseui/SBigScreenHeader/index.vue'
 import STag from './components/STag/index.vue'
 // 导入常量
 import { s, mapSize } from './constants'
