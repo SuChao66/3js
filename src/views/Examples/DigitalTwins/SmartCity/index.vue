@@ -16,11 +16,15 @@
 import * as THREE from 'three'
 // 导入性能监视器
 import Status from 'three/examples/jsm/libs/stats.module'
-// 导入TWEEN
-import * as TWEEN from '@tweenjs/tween.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// 导入gltfloader
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+// 导入dracoloader
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // 导入hooks
 import { useWindowSize, useStatusByEnv } from '@/hooks'
-import { useThree } from './hook'
+// import { useThree, useShangHai, useHuangPuRiver } from './hook'
+import { useThree, useBuildMaterial } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 
@@ -40,7 +44,8 @@ let scene: THREE.Scene, // 场景
   camera: THREE.PerspectiveCamera, // 相机
   renderer: THREE.WebGLRenderer, // 渲染器
   status: Status, // 性能监视器
-  model: THREE.Group // 地球网格模型
+  controls: OrbitControls,
+  model: THREE.Group // 上海网格模型
 
 // 初始化
 const init = () => {
@@ -48,12 +53,14 @@ const init = () => {
     scene: mScene,
     camera: mCamera,
     renderer: mRenderer,
-    status: mStatus
+    status: mStatus,
+    controls: mControls
   } = useThree(document.getElementById('webgl') as HTMLCanvasElement)
   scene = mScene
   camera = mCamera
   status = mStatus
   renderer = mRenderer
+  controls = mControls
   // 添加性能监视器
   if (useStatusByEnv()) {
     statusRef.value?.appendChild(mStatus.dom)
@@ -62,12 +69,53 @@ const init = () => {
 
 // 加载模型
 const initModel = async () => {
-  // 1.创建地球
   model = new THREE.Group()
   scene.add(model)
 
-  // 结束loading
-  isLoading.value = false
+  // 设置解压缩资源路径
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('./draco/gltf/')
+  const loader = new GLTFLoader()
+  loader.setDRACOLoader(dracoLoader)
+  loader.load(
+    './models/上海外滩_draco.glb',
+    (gltf) => {
+      // 把gltf.scene中的所有模型添加到model组对象中
+      model.add(gltf.scene)
+      // 1.处理河流
+      const river = gltf.scene.getObjectByName('黄浦江') as any
+      river.material = new THREE.MeshLambertMaterial({
+        color: river.material.color
+      })
+      // 2.处理楼房
+      const build = gltf.scene.getObjectByName('楼房') as any
+      build.material = new THREE.MeshLambertMaterial({
+        color: 0x00ffff
+      })
+      useBuildMaterial({
+        build
+      })
+    },
+    (xhr) => {
+      currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
+      if (currentProgress.value === 100) {
+        isLoading.value = false
+      }
+    }
+  )
+
+  // 1.渲染上海外滩
+  // const shanghai = (await useShangHai({
+  //   path: './data/城市建筑数据/GeoJSON数据/上海/上海外滩.json'
+  // })) as any
+  // model.add(shanghai)
+  // // 2.创建黄浦江
+  // const river = (await useHuangPuRiver({
+  //   path: './data/城市建筑数据/GeoJSON数据/上海/黄浦江.json'
+  // })) as any
+  // model.add(river)
+  // // 关闭loading
+  // isLoading.value = false
 }
 
 // 渲染
@@ -78,10 +126,8 @@ const animate = () => {
   timer.value = requestAnimationFrame(animate)
   // 更新性能监视器
   status && status.update()
-  // 更新动画时间
-  TWEEN.update()
-  // 旋转地球
-  model && model.rotateY(0.0015)
+  // 更新相机控件
+  controls && controls.update()
 }
 
 // 监听窗口的变化

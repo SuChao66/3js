@@ -31,6 +31,7 @@ export * from './three/useShape'
 export * from './three/useExtrude'
 export * from './three/useSphere'
 export * from './three/useArcLine'
+export * from './three/useExportGLTF'
 // three后处理hook
 export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'

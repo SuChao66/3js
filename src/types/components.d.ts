@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Banner: typeof import('./../components/Banner/index.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
     ElCarousel: typeof import('element-plus/es')['ElCarousel']
@@ -30,5 +31,6 @@ declare module 'vue' {
     STheme: typeof import('./../components/STheme/index.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
     Swiper: typeof import('./../components/Swiper/index.vue')['default']
+    VideoBg: typeof import('./../components/VideoBg/index.vue')['default']
   }
 }

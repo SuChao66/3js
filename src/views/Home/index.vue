@@ -3,8 +3,11 @@
     <el-container>
       <Header />
       <el-main>
+        <!-- banner -->
+        <!-- <Banner /> -->
         <!-- 轮播图 -->
-        <Swiper />
+        <!-- <Swiper /> -->
+        <VideoBg />
         <!-- 数字孪生 -->
         <DigitalTwins :column="column" :isRender="isRender" />
         <!-- 3D展览 -->
@@ -21,7 +24,9 @@
 <script lang="ts" setup>
 // 导入组件
 import Header from '@/components/Header/index.vue'
-import Swiper from '@/components/Swiper/index.vue'
+// import Banner from '@/components/Banner/index.vue'
+// import Swiper from '@/components/Swiper/index.vue'
+import VideoBg from '@/components/VideoBg/index.vue'
 import DigitalTwins from './modules/DigitalTwins/index.vue'
 import Mataverse from './modules/Mataverse/index.vue'
 import Exhibition from './modules/Exhibition/index.vue'
@@ -33,7 +38,7 @@ const { width } = useWindowSize()
 // 是否渲染作品card
 const isRender = ref<boolean>(true)
 // 每行展示几个作品
-const column = ref(5)
+const column = ref(4)
 
 watch(
   () => width,
