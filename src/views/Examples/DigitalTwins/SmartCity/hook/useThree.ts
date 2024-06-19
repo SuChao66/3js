@@ -15,7 +15,7 @@ import {
 import { cameraPos, cameraTarget } from '../constants'
 
 export const useThree = (canvas: HTMLCanvasElement) => {
-  const { initAmbientLight } = useLights()
+  const { initAmbientLight, initDirectionalLight } = useLights()
   const { initPerspectiveCamera } = useCamera()
   const { initControls } = useControls()
   const { initFog } = useFog()
@@ -37,7 +37,20 @@ export const useThree = (canvas: HTMLCanvasElement) => {
     position: cameraTarget
   })
   // 1.4.设置光源
-  initAmbientLight({ scene, density: 0.6 })
+  // 平行光1
+  initDirectionalLight({
+    position: new THREE.Vector3(200, 400, 300),
+    density: 0.8,
+    scene,
+    name: 'directionalLight1'
+  })
+  initDirectionalLight({
+    position: new THREE.Vector3(-200, -400, 300),
+    density: 0.8,
+    scene,
+    name: 'directionalLight2'
+  })
+  initAmbientLight({ scene, density: 0.3 })
   // 1.5.创建相机
   const { x, y } = useLon2Mercator(cameraTarget.x, cameraTarget.y)
   const camera = initPerspectiveCamera({
@@ -57,7 +70,13 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   // 开启缓动动画
   controls.enableDamping = true
   controls.enablePan = false
+  // controls.enableRotate = false
   controls.enableZoom = true
+  controls.minPolarAngle = Math.PI / 2
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(160)
+  // 水平旋转最大最小值
+  controls.minAzimuthAngle = -Math.PI / 4
+  controls.maxAzimuthAngle = Math.PI / 4
 
   return {
     scene,

@@ -22,11 +22,19 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 // 导入dracoloader
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // 导入hooks
-import { useWindowSize, useStatusByEnv } from '@/hooks'
+import { useWindowSize, useStatusByEnv, useLon2Mercator } from '@/hooks'
 // import { useThree, useShangHai, useHuangPuRiver } from './hook'
-import { useThree, useBuildMaterial } from './hook'
+import {
+  useThree,
+  useBuildMaterial,
+  useConeMesh,
+  useLightSphere,
+  useSignalMesh
+} from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
+// 导入常量
+import { cameraTarget } from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -45,7 +53,9 @@ let scene: THREE.Scene, // 场景
   renderer: THREE.WebGLRenderer, // 渲染器
   status: Status, // 性能监视器
   controls: OrbitControls,
-  model: THREE.Group // 上海网格模型
+  model: THREE.Group, // 上海网格模型
+  flyGroup: THREE.Group, // 无人机
+  mixer: THREE.AnimationMixer
 
 // 初始化
 const init = () => {
@@ -90,11 +100,23 @@ const initModel = async () => {
       // 2.处理楼房
       const build = gltf.scene.getObjectByName('楼房') as any
       build.material = new THREE.MeshLambertMaterial({
-        color: 0x00ffff
+        // color: 0x00ffff
+        color: 0x00aaaa, //场景大可以暗一些  要不然整个屏幕太亮
+        transparent: true, //允许透明计算
+        opacity: 0.7 //半透明设置
       })
       useBuildMaterial({
         build
       })
+      // 3.创建四棱锥标注场景
+      const coneMesh = useConeMesh({
+        size: 40,
+        x: cameraTarget.x,
+        y: cameraTarget.y
+      })
+      model.add(coneMesh)
+      // 4.加载无人机
+      initFly()
     },
     (xhr) => {
       currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
@@ -118,8 +140,44 @@ const initModel = async () => {
   // isLoading.value = false
 }
 
+// 加载无人机
+const initFly = () => {
+  flyGroup = new THREE.Group()
+  const { x, y } = useLon2Mercator(cameraTarget.x, cameraTarget.y)
+  flyGroup.position.set(x, y, 600)
+  flyGroup.translateX(28 * 25)
+  model.add(flyGroup)
+  // 加载无人机模型
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('./draco/gltf/')
+  const loader = new GLTFLoader()
+  loader.setDRACOLoader(dracoLoader)
+  loader.load('./models/plane.glb', (gltf: any) => {
+    // 保存无人机模型
+    const fly = gltf.scene
+    // 根据需要放大无人机
+    fly.scale.set(4, 4, 4)
+    // 播放无人机动画
+    mixer = new THREE.AnimationMixer(fly)
+    const AnimationAction = mixer.clipAction(gltf.animations[0])
+    AnimationAction.timeScale = 15
+    AnimationAction.play()
+    // 创建光球，包裹无人机
+    const lightSphere = useLightSphere({
+      radius: 200
+    })
+    // 创建信号波
+    const signal = useSignalMesh()
+    flyGroup.add(fly)
+    flyGroup.add(lightSphere)
+    flyGroup.add(signal)
+  })
+}
+
 // 渲染
+const clock = new THREE.Clock()
 const animate = () => {
+  const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene, camera)
   // 请求动画帧
@@ -128,6 +186,10 @@ const animate = () => {
   status && status.update()
   // 更新相机控件
   controls && controls.update()
+  // 更新动画
+  if (mixer) {
+    mixer.update(delta)
+  }
 }
 
 // 监听窗口的变化
