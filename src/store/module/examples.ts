@@ -4,6 +4,7 @@ import type { ICard } from '@/baseui/SCard/types'
 // 导入图片
 import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png' // 智慧工厂
 import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
+import smartCity from '@/assets/images/examples/3d-smart-city.png' // 智慧收费站
 import moblie from '@/assets/images/examples/moblie.png' // 3D手机
 import BYDSongSmall from '@/assets/images/examples/BYD-song-small.png' // BYD-宋
 import smartCommunitySmall from '@/assets/images/examples/smart-community-small.png' // 智慧小区
@@ -40,7 +41,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 4,
       title: '智慧城市',
-      img: inDeveloping,
+      img: smartCity,
       desc: '智慧城市管理',
       path: 'SmartCity'
     }
