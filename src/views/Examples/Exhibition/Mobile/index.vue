@@ -23,8 +23,6 @@
 import * as THREE from 'three'
 // 导入性能监视器
 import Status from 'three/examples/jsm/libs/stats.module'
-// 导入相机控制器
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 // 导入GLTF加载器
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // 导入draco解压器
@@ -75,7 +73,6 @@ let scene: THREE.Scene, // 场景
   css2DRenderer: CSS2DRenderer, // css2渲染器
   model: THREE.Group, // 模型集合
   status: Status, // 性能监视器
-  controls: OrbitControls, // 相机控制器
   textureCube: THREE.CubeTexture, // 环境贴图
   sprite: THREE.Sprite, // 光点精灵
   gui: any
@@ -86,7 +83,6 @@ const init = () => {
     scene: mScene,
     camera: mCamera,
     renderer: mRenderer,
-    controls: mControls,
     status: mStatus,
     textureCube: mTextureCube,
     gui: mGui,
@@ -95,7 +91,6 @@ const init = () => {
   scene = mScene
   camera = mCamera
   status = mStatus
-  controls = mControls
   renderer = mRenderer
   css2DRenderer = mCss2DRenderer
   textureCube = mTextureCube

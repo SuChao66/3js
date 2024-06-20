@@ -40,6 +40,16 @@ const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/DigitalTwins/SmartCommunity/index.vue')
+  },
+  // 5.智慧城市——北京
+  {
+    name: 'SmartCityBeiJing',
+    path: '/smartCityBeiJing',
+    meta: {
+      title: 'SmartCityBeiJing'
+    },
+    component: () =>
+      import('@/views/Examples/DigitalTwins/SmartCityBeiJing/index.vue')
   }
 ]
 

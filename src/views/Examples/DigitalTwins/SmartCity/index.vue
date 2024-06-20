@@ -23,7 +23,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // 导入hooks
 import { useWindowSize, useStatusByEnv, useLon2Mercator } from '@/hooks'
-// import { useThree, useShangHai, useHuangPuRiver } from './hook'
 import {
   useThree,
   useBuildMaterial,
@@ -136,8 +135,9 @@ const initModel = async () => {
   //   path: './data/城市建筑数据/GeoJSON数据/上海/黄浦江.json'
   // })) as any
   // model.add(river)
+
   // // 关闭loading
-  // isLoading.value = false
+  isLoading.value = false
 }
 
 // 加载无人机

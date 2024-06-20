@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-// 相机的位置坐标
+// 相机的位置坐标_上海
 export const cameraPos = new THREE.Vector3(13524809, 3660975, 1840)
 // 相机的朝向(东方明珠)
 export const cameraTarget = new THREE.Vector3(
