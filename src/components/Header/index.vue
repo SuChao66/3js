@@ -9,7 +9,7 @@
         <!-- 中英文 -->
         <Locale />
         <!-- 主题 -->
-        <STheme />
+        <STheme v-if="isShowRight" />
         <!-- github -->
         <SGitHub />
       </el-col>
@@ -26,8 +26,15 @@ import SGitHub from '../SGitHub/index.vue'
 import logo from '@/assets/images/logo.jpg'
 // 导入store
 import { useStore } from '@/store'
+// 导入类型
+import type { IProps } from './types'
 
 const { global } = useStore()
+
+const props = withDefaults(defineProps<IProps>(), {
+  isShowRight: true
+})
+const { isShowRight } = toRefs(props)
 </script>
 
 <style lang="less" scoped>

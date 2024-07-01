@@ -9,3 +9,8 @@ declare module '*.vue' {
 declare module 'point-in-polygon'
 
 declare module 'delaunator'
+
+declare module '*.glsl' {
+  const value: string
+  export default value
+}

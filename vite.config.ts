@@ -14,6 +14,8 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import legacy from '@vitejs/plugin-legacy'
 // svg插件
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+// glsl插件
+import glsl from 'vite-plugin-glsl'
 
 const vendorLibs: { match: string[]; output: string }[] = [
   {
@@ -69,6 +71,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
     plugins: [
       vue(),
+      glsl(),
       AutoImport({
         // 配置需要自动导入的模块
         imports: ['vue', 'vue-router', 'vue-i18n'],

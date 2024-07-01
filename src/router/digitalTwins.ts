@@ -50,6 +50,25 @@ const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/DigitalTwins/SmartCityBeiJing/index.vue')
+  },
+  // 6.3D看房
+  {
+    name: '3dHourse',
+    path: '/3dhourse',
+    meta: {
+      title: '3dHourse'
+    },
+    component: () => import('@/views/Examples/DigitalTwins/3DHourse/index.vue')
+  },
+  // 7.元宵灯会
+  {
+    name: 'LanternFestival',
+    path: '/lanternFestival',
+    meta: {
+      title: 'LanternFestival'
+    },
+    component: () =>
+      import('@/views/Examples/DigitalTwins/LanternFestival/index.vue')
   }
 ]
 
