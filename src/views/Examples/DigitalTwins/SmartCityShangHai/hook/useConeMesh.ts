@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 // 导入hook
 import { useLon2Mercator } from '@/hooks'
-import { useWaveCircle } from '../hook'
+import { useWaveCircle } from './index.js'
 // 导入shader
 import output_fragment_cone from '../shaders/output_fragment_cone.glsl.js'
 

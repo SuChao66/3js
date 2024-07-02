@@ -45,7 +45,7 @@ const useExampleStore = defineStore('examples', () => {
       title: '智慧城市_上海外滩',
       img: smartCity,
       desc: '智慧城市管理',
-      path: 'SmartCity'
+      path: 'SmartCityShangHai'
     },
     {
       key: 5,
