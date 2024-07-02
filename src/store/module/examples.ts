@@ -4,7 +4,7 @@ import type { ICard } from '@/baseui/SCard/types'
 // 导入图片
 import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png' // 智慧工厂
 import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
-import smartCity from '@/assets/images/examples/3d-smart-city.png' // 智慧城市-上海外滩
+import smartCityShanghai from '@/assets/images/examples/3d-smart-city-shanghai.png' // 智慧城市-上海外滩
 import smartCityBeiJing from '@/assets/images/examples/3d-smart-city-beijing.png' // 智慧城市-北京城
 import lanternFestival from '@/assets/images/examples/lantern-festival.png' // 智慧城市-北京城
 import moblie from '@/assets/images/examples/moblie.png' // 3D手机
@@ -14,6 +14,7 @@ import earthBigScreenSmall from '@/assets/images/examples/3d-earth-small.png' //
 import GDP from '@/assets/images/examples/3d-gdp-small.png' // GDP数据大屏
 import population from '@/assets/images/examples/3d-population-small.png' // 人口密度数据大屏
 import map from '@/assets/images/examples/3d-map-small.png' // 人口密度数据大屏
+import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度数据大屏
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -42,14 +43,14 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 4,
-      title: '智慧城市_上海外滩',
-      img: smartCity,
-      desc: '智慧城市管理',
+      title: '魔都_上海外滩',
+      img: smartCityShanghai,
+      desc: '外滩美景，欣赏万国建筑',
       path: 'SmartCityShangHai'
     },
     {
       key: 5,
-      title: '智慧城市_北京城',
+      title: '帝都_北京城',
       img: smartCityBeiJing,
       desc: '北京市公交、地铁路线图',
       path: 'SmartCityBeiJing'
@@ -117,6 +118,13 @@ const useExampleStore = defineStore('examples', () => {
       img: earthBigScreenSmall,
       desc: '3D地球可视化',
       path: '3dEarth'
+    },
+    {
+      key: 5,
+      title: '智慧城市',
+      img: smartCity,
+      desc: '智慧城市管理系统',
+      path: 'SmartCity'
     }
   ])
 

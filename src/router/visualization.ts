@@ -30,7 +30,7 @@ const VisualizationRoutes: Array<RouteRecordRaw> = [
     component: () =>
       import('@/views/Examples/Visualization/PopulationDensity/index.vue')
   },
-  // 2.全球航班地球可视化
+  // 4.全球航班地球可视化
   {
     name: '3dEarth',
     path: '/3dEarth',
@@ -38,6 +38,16 @@ const VisualizationRoutes: Array<RouteRecordRaw> = [
       title: '3dEarth'
     },
     component: () => import('@/views/Examples/Visualization/Earth/index.vue')
+  },
+  // 8.智慧城市管理大屏可视化
+  {
+    name: 'SmartCity',
+    path: '/smartCity',
+    meta: {
+      title: 'SmartCity'
+    },
+    component: () =>
+      import('@/views/Examples/Visualization/SmartCity/index.vue')
   }
 ]
 
