@@ -10,10 +10,12 @@
         <VideoBg />
         <!-- 数字孪生 -->
         <DigitalTwins :column="column" :isRender="isRender" />
-        <!-- 3D展览 -->
-        <Exhibition :column="column" :isRender="isRender" />
         <!-- 3D数据可视化 -->
         <Visualization :column="column" :isRender="isRender" />
+        <!-- 3D展览 -->
+        <Exhibition :column="column" :isRender="isRender" />
+        <!-- shader鉴赏 -->
+        <Shaders :column="column" :isRender="isRender" />
         <!-- 元宇宙 -->
         <!-- <Mataverse :column="column" :isRender="isRender" /> -->
       </el-main>
@@ -31,6 +33,7 @@ import DigitalTwins from './modules/DigitalTwins/index.vue'
 // import Mataverse from './modules/Mataverse/index.vue'
 import Exhibition from './modules/Exhibition/index.vue'
 import Visualization from './modules/Visualization/index.vue'
+import Shaders from './modules/Shaders/index.vue'
 // 导入hook
 import { useWindowSize } from '@/hooks'
 

@@ -15,6 +15,7 @@ import GDP from '@/assets/images/examples/3d-gdp-small.png' // GDP数据大屏
 import population from '@/assets/images/examples/3d-population-small.png' // 人口密度数据大屏
 import map from '@/assets/images/examples/3d-map-small.png' // 人口密度数据大屏
 import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度数据大屏
+import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 人口密度数据大屏
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -127,12 +128,23 @@ const useExampleStore = defineStore('examples', () => {
       path: 'SmartCity'
     }
   ])
+  // 5.shader鉴赏
+  const shadersExamples = reactive<ICard[]>([
+    {
+      key: 1,
+      title: '粒子效果',
+      img: particleSwarms,
+      desc: '波涛汹涌的粒子效果',
+      path: 'ParticleSwarms'
+    }
+  ])
 
   return {
     digitalTwinsExamples,
     metaverseExamples,
     exhibitionExamples,
-    visualizationExamples
+    visualizationExamples,
+    shadersExamples
   }
 })
 
