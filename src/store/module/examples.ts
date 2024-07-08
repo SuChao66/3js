@@ -15,7 +15,8 @@ import GDP from '@/assets/images/examples/3d-gdp-small.png' // GDP数据大屏
 import population from '@/assets/images/examples/3d-population-small.png' // 人口密度数据大屏
 import map from '@/assets/images/examples/3d-map-small.png' // 人口密度数据大屏
 import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度数据大屏
-import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 人口密度数据大屏
+import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 粒子群效果
+import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾效果
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -136,6 +137,13 @@ const useExampleStore = defineStore('examples', () => {
       img: particleSwarms,
       desc: '波涛汹涌的粒子效果',
       path: 'ParticleSwarms'
+    },
+    {
+      key: 1,
+      title: '烟雾水云',
+      img: waterFlow,
+      desc: '烟雾水云，实现你的腾云驾雾',
+      path: 'WaterFlow'
     }
   ])
 

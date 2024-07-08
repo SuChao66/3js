@@ -11,6 +11,15 @@ const ShadersRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/ShadersExp/ParticleSwarms/index.vue')
+  },
+  // 2.烟雾水云效果
+  {
+    name: 'WaterFlow',
+    path: '/waterFlow',
+    meta: {
+      title: 'WaterFlow'
+    },
+    component: () => import('@/views/Examples/ShadersExp/WaterFlow/index.vue')
   }
 ]
 
