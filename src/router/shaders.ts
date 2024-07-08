@@ -20,6 +20,15 @@ const ShadersRoutes: Array<RouteRecordRaw> = [
       title: 'WaterFlow'
     },
     component: () => import('@/views/Examples/ShadersExp/WaterFlow/index.vue')
+  },
+  // 3.星辰大海
+  {
+    name: 'StarsSea',
+    path: '/starsSea',
+    meta: {
+      title: 'StarsSea'
+    },
+    component: () => import('@/views/Examples/ShadersExp/StarsSea/index.vue')
   }
 ]
 

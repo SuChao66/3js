@@ -139,11 +139,18 @@ const useExampleStore = defineStore('examples', () => {
       path: 'ParticleSwarms'
     },
     {
-      key: 1,
+      key: 2,
       title: '烟雾水云',
       img: waterFlow,
       desc: '烟雾水云，实现你的腾云驾雾',
       path: 'WaterFlow'
+    },
+    {
+      key: 3,
+      title: '星辰大海',
+      img: inDeveloping,
+      desc: '满目星辰，心怀大海，',
+      path: 'StarsSea'
     }
   ])
 
