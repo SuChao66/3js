@@ -47,8 +47,8 @@ const params = {
   uNoiseFrequency: 10, // 噪音频率
   uNoiseScale: 1.5, // 噪声幅度
   uXzFrequency: 1.5, // xoz平面上，x、z频率比值，确保x、z方向上波纹频率不一致
-  uLowColor: '#ffff00', // 最低点颜色
-  uHighColor: '#00ffff', // 最高点颜色
+  uLowColor: '#da7d4e', // 最低点颜色
+  uHighColor: '#c22424', // 最高点颜色
   uOpacity: 1.0, // 透明度
   uXspeed: 1.0, // x方向波纹移动速度
   uZspeed: 1.5, // z方向波纹移动速度
@@ -129,7 +129,7 @@ const init = () => {
   controls = mControls
   // 添加性能监视器
   if (useStatusByEnv()) {
-    // statusRef.value?.appendChild(mStatus.dom)
+    statusRef.value?.appendChild(mStatus.dom)
   }
 }
 
