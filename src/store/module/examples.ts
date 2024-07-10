@@ -17,6 +17,7 @@ import map from '@/assets/images/examples/3d-map-small.png' // 人口密度数�
 import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度数据大屏
 import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 粒子群效果
 import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾效果
+import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -148,7 +149,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 3,
       title: '星辰大海',
-      img: inDeveloping,
+      img: starsSea,
       desc: '满目星辰，心怀大海，',
       path: 'StarsSea'
     }

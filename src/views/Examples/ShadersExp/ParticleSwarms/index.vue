@@ -25,8 +25,6 @@ import SLoading from '@/baseui/SLoading/index.vue'
 // 导入shader
 import vertexShader from './shaders/vertex.glsl'
 import fragmentShader from './shaders/fragment.glsl'
-// 导入动画库
-// import gsap from 'gsap'
 
 // 1.定义变量
 const { width, height } = useWindowSize()

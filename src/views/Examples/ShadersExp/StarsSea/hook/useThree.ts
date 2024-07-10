@@ -5,6 +5,7 @@ import {
   useStatus,
   useRenderer,
   useControls
+  // useAxesHelper
   // useHdr
 } from '@/hooks'
 // 导入常量
@@ -18,6 +19,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   const scene = useScene()
   // 1.2.设置天空盒
   // useHdr({ path: './hdr/sky1.hdr', scene })
+  // useAxesHelper({ scene })
   // 1.5.创建相机
   const camera = initPerspectiveCamera({
     fov: 30,
