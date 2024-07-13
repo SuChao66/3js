@@ -32,6 +32,8 @@ export * from './three/useExtrude'
 export * from './three/useSphere'
 export * from './three/useArcLine'
 export * from './three/useExportGLTF'
+export * from './three/useCanvasSprite'
+export * from './three/useProgress'
 // three后处理hook
 export * from './effectPass/useEffectComposer'
 export * from './effectPass/useOutlinePass'

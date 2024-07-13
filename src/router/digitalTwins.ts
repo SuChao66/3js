@@ -70,6 +70,16 @@ const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/DigitalTwins/LanternFestival/index.vue')
+  },
+  // 8.3D展厅
+  {
+    name: 'ExhibitionHall',
+    path: '/exhibitionHall',
+    meta: {
+      title: 'ExhibitionHall'
+    },
+    component: () =>
+      import('@/views/Examples/DigitalTwins/ExhibitionHall/index.vue')
   }
 ]
 

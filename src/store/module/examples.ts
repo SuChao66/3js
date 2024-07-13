@@ -18,6 +18,7 @@ import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度�
 import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 粒子群效果
 import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾效果
 import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
+import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -60,7 +61,7 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 6,
-      title: '3D看房',
+      title: '全景看房',
       img: inDeveloping,
       desc: '足不出户，打造你的专属小窝',
       path: '3dHourse'
@@ -71,6 +72,13 @@ const useExampleStore = defineStore('examples', () => {
       img: lanternFestival,
       desc: '元宵灯会，中国人的专属烂漫',
       path: 'LanternFestival'
+    },
+    {
+      key: 8,
+      title: '3D展厅',
+      img: exhibitionHall,
+      desc: '足不出户，带你逛遍整个展览',
+      path: 'ExhibitionHall'
     }
   ])
   // 2.元宇宙

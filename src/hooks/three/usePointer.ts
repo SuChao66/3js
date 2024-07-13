@@ -1,3 +1,8 @@
+/**
+ * 将鼠标点击坐标转换为three坐标
+ * @param event
+ * @returns
+ */
 export const usePointer = (event: any) => {
   const px = event.offsetX
   const py = event.offsetY
