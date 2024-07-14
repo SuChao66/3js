@@ -54,7 +54,7 @@ const active = ref<string>('')
 const buttons = ref([
   {
     name: 'THREE',
-    path: '3js'
+    path: 'three'
   },
   {
     name: 'CESIUM',
