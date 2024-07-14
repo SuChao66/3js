@@ -43,12 +43,8 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enableDamping = true
   controls.enablePan = false
   controls.enableZoom = true
-  // 设置自动旋转
-  controls.autoRotate = true
-  controls.autoRotateSpeed = 0.2
-  // 设置缩放
-  controls.minDistance = 30
-  controls.maxDistance = 50
+  // 设置最大缩放距离
+  controls.maxDistance = 3
 
   return {
     scene,

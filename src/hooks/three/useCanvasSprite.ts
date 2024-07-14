@@ -22,7 +22,7 @@ export const useCanvasSprite = ({
   // 获取上下文
   const context = canvas.getContext('2d')!
   // 设置canvas标签样式
-  context.fillStyle = 'rgba(0,0,0,0.7)'
+  context.fillStyle = 'rgba(100, 100, 100, 0.7)'
   context.fillRect(0, 256, 1024, 512)
   context.textAlign = 'center'
   context.textBaseline = 'middle'

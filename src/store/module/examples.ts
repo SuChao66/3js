@@ -18,6 +18,7 @@ import smartCity from '@/assets/images/examples/smart-city.png' // 人口密度�
 import particleSwarms from '@/assets/images/examples/particle-swarms.png' // 粒子群效果
 import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾效果
 import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
+import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import inDeveloping from '@/assets/images/in-developing.png'
 
@@ -62,7 +63,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 6,
       title: '全景看房',
-      img: inDeveloping,
+      img: Hourse,
       desc: '足不出户，打造你的专属小窝',
       path: '3dHourse'
     },

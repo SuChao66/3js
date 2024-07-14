@@ -84,7 +84,7 @@ const init = () => {
   controls = mControls
   // 添加性能监视器
   if (useStatusByEnv()) {
-    // statusRef.value?.appendChild(mStatus.dom)
+    statusRef.value?.appendChild(mStatus.dom)
   }
 }
 
