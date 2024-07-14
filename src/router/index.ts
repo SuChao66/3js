@@ -13,7 +13,20 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: 'Home'
     },
-    component: () => import('@/views/Home/index.vue')
+    component: () => import('@/views/Home/index.vue'),
+    redirect: '/three',
+    children: [
+      {
+        name: 'Three',
+        path: '/three',
+        component: () => import('@/views/3js/index.vue')
+      },
+      {
+        name: 'Cesium',
+        path: '/cesium',
+        component: () => import('@/views/Cesium/index.vue')
+      }
+    ]
   },
   ...exampleRoutes
 ]

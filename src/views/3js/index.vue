@@ -1,10 +1,17 @@
 <template>
-  <div class="home">
+  <div class="3js">
     <el-container>
-      <Header :isShowRight="isShowRight" />
       <el-main>
-        <VideoBg />
-        <router-view />
+        <!-- 数字孪生 -->
+        <DigitalTwins :column="column" :isRender="isRender" />
+        <!-- 3D数据可视化 -->
+        <Visualization :column="column" :isRender="isRender" />
+        <!-- 3D展览 -->
+        <Exhibition :column="column" :isRender="isRender" />
+        <!-- shader鉴赏 -->
+        <Shaders :column="column" :isRender="isRender" />
+        <!-- 元宇宙 -->
+        <!-- <Mataverse :column="column" :isRender="isRender" /> -->
       </el-main>
     </el-container>
   </div>
@@ -13,7 +20,14 @@
 <script lang="ts" setup>
 // 导入组件
 import Header from '@/components/Header/index.vue'
+// import Banner from '@/components/Banner/index.vue'
+// import Swiper from '@/components/Swiper/index.vue'
 import VideoBg from '@/components/VideoBg/index.vue'
+import DigitalTwins from './modules/DigitalTwins/index.vue'
+// import Mataverse from './modules/Mataverse/index.vue'
+import Exhibition from './modules/Exhibition/index.vue'
+import Visualization from './modules/Visualization/index.vue'
+import Shaders from './modules/Shaders/index.vue'
 // 导入hook
 import { useWindowSize } from '@/hooks'
 

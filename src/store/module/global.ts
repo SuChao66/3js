@@ -4,7 +4,7 @@ import type { IGlobalState } from '../types'
 
 const useGlobalState = defineStore('global', {
   state: (): IGlobalState => ({
-    title: 'ThreeJS 3D',
+    title: '三维世界',
     locale: 'chinese',
     theme: 'light'
   }),
