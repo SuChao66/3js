@@ -163,13 +163,16 @@ const useExampleStore = defineStore('examples', () => {
       path: 'StarsSea'
     }
   ])
+  // 6.cesium案例
+  const cesiumExamples = reactive<ICard[]>([])
 
   return {
     digitalTwinsExamples,
     metaverseExamples,
     exhibitionExamples,
     visualizationExamples,
-    shadersExamples
+    shadersExamples,
+    cesiumExamples
   }
 })
 

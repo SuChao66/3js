@@ -16,6 +16,8 @@ import legacy from '@vitejs/plugin-legacy'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 // glsl插件
 import glsl from 'vite-plugin-glsl'
+// 导入cesium插件
+import cesium from 'vite-plugin-cesium'
 
 const vendorLibs: { match: string[]; output: string }[] = [
   {
@@ -72,6 +74,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     plugins: [
       vue(),
       glsl(),
+      cesium(),
       AutoImport({
         // 配置需要自动导入的模块
         imports: ['vue', 'vue-router', 'vue-i18n'],

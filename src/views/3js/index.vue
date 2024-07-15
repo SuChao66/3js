@@ -19,10 +19,6 @@
 
 <script lang="ts" setup>
 // 导入组件
-import Header from '@/components/Header/index.vue'
-// import Banner from '@/components/Banner/index.vue'
-// import Swiper from '@/components/Swiper/index.vue'
-import VideoBg from '@/components/VideoBg/index.vue'
 import DigitalTwins from './modules/DigitalTwins/index.vue'
 // import Mataverse from './modules/Mataverse/index.vue'
 import Exhibition from './modules/Exhibition/index.vue'

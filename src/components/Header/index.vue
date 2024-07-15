@@ -1,11 +1,11 @@
 <template>
   <el-header>
     <el-row>
-      <el-col :span="11" class="left">
+      <el-col :span="10" class="left">
         <img :src="logo" alt="" class="logo" />
         {{ global.title }}
       </el-col>
-      <el-col :span="2" class="middle">
+      <el-col :span="4" class="middle">
         <div
           v-for="button in buttons"
           :key="button.name"
@@ -15,7 +15,7 @@
           {{ button.name }}
         </div>
       </el-col>
-      <el-col :span="11" class="right">
+      <el-col :span="10" class="right">
         <!-- 中英文 -->
         <Locale />
         <!-- 主题 -->
