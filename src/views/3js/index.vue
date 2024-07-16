@@ -26,14 +26,15 @@ import Visualization from './modules/Visualization/index.vue'
 import Shaders from './modules/Shaders/index.vue'
 // 导入hook
 import { useWindowSize } from '@/hooks'
+// 导入store
+import { useStore } from '@/store'
 
+const { global } = useStore()
 const { width } = useWindowSize()
 // 是否渲染作品card
 const isRender = ref<boolean>(true)
 // 每行展示几个作品
 const column = ref(4)
-// 是否展示顶部右侧内容
-const isShowRight = ref<boolean>(true)
 
 watch(
   () => width,
@@ -41,15 +42,16 @@ watch(
     isRender.value = false
     if (val.value < 400) {
       column.value = 1
+      global.SET_IS_SHOW_HEADER_RIGHT(false)
     } else if (val.value < 700) {
       column.value = 2
-      isShowRight.value = false
+      global.SET_IS_SHOW_HEADER_RIGHT(false)
     } else if (val.value < 1000) {
       column.value = 3
-      isShowRight.value = true
+      global.SET_IS_SHOW_HEADER_RIGHT(false)
     } else {
       column.value = 4
-      isShowRight.value = true
+      global.SET_IS_SHOW_HEADER_RIGHT(true)
     }
     setTimeout(() => {
       isRender.value = true

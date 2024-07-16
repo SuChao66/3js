@@ -7,6 +7,7 @@ const useGlobalState = defineStore('global', {
     title: '三维世界',
     locale: 'chinese',
     theme: 'light',
+    isShowHeaderRight: true,
     // cesium的默认token
     defaultAccessToken:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjMGVlYzE1Zi04OGM5LTRlNjUtOWU3Yi03ZDNkMzFkMWViYmIiLCJpZCI6MjI1MzA5LCJpYXQiOjE3MTk2NDE2NzV9.fQnlPna9m5h95UMn3u0r-CeafK27R4IXMY4rdsUzJlg'
@@ -19,6 +20,10 @@ const useGlobalState = defineStore('global', {
     // 改变主题
     SET_THEME(theme: string) {
       this.theme = theme
+    },
+    // 是否显示header右侧
+    SET_IS_SHOW_HEADER_RIGHT(isShowHeaderRight: boolean) {
+      this.isShowHeaderRight = isShowHeaderRight
     }
   },
   // 数据持久化
