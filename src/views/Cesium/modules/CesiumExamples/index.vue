@@ -1,5 +1,5 @@
 <template>
-  <STitle title="智慧城市" />
+  <STitle title="地球可视化" />
   <template v-if="exmaples.cesiumExamples.length > 0">
     <div class="example-list" v-if="isRender">
       <SCard

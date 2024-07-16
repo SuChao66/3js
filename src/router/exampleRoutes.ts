@@ -8,12 +8,15 @@ import { ExhibitionRoutes } from './exhibition'
 import { VisualizationRoutes } from './visualization'
 // shader案例
 import { ShadersRoutes } from './shaders'
+// cesium案例
+import { CesiumRoutes } from './cesium'
 
 const exampleRoutes: Array<RouteRecordRaw> = [
   ...DigitalTwinsRoutes,
   ...ExhibitionRoutes,
   ...VisualizationRoutes,
-  ...ShadersRoutes
+  ...ShadersRoutes,
+  ...CesiumRoutes
 ]
 
 export { exampleRoutes }

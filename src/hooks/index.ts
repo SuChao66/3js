@@ -52,6 +52,7 @@ export * from './common/useWorldMap'
 export * from './common/useSort'
 export * from './common/useMinMax'
 export * from './common/useTriangularCenter'
+export * from './common/useCesiumBaseUrl'
 // math
 export * from './math/useRadianAOB'
 export * from './math/useThreePointCenter'

@@ -164,7 +164,15 @@ const useExampleStore = defineStore('examples', () => {
     }
   ])
   // 6.cesium案例
-  const cesiumExamples = reactive<ICard[]>([])
+  const cesiumExamples = reactive<ICard[]>([
+    {
+      key: 1,
+      title: '地球可视化',
+      img: inDeveloping,
+      desc: '使用Cesium实现地球可视化',
+      path: 'Earth'
+    }
+  ])
 
   return {
     digitalTwinsExamples,

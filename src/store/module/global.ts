@@ -6,7 +6,10 @@ const useGlobalState = defineStore('global', {
   state: (): IGlobalState => ({
     title: '三维世界',
     locale: 'chinese',
-    theme: 'light'
+    theme: 'light',
+    // cesium的默认token
+    defaultAccessToken:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjMGVlYzE1Zi04OGM5LTRlNjUtOWU3Yi03ZDNkMzFkMWViYmIiLCJpZCI6MjI1MzA5LCJpYXQiOjE3MTk2NDE2NzV9.fQnlPna9m5h95UMn3u0r-CeafK27R4IXMY4rdsUzJlg'
   }),
   actions: {
     // 改变语言
