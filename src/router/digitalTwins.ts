@@ -2,6 +2,16 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
+  // 0.智慧园区
+  {
+    name: 'SmartParks',
+    path: '/smartParks',
+    meta: {
+      title: 'SmartParks'
+    },
+    component: () =>
+      import('@/views/Examples/DigitalTwins/SmartParks/index.vue')
+  },
   // 1.智慧工厂
   {
     name: 'SmartFactory',

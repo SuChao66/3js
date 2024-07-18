@@ -25,11 +25,19 @@ import inDeveloping from '@/assets/images/in-developing.png'
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
   const digitalTwinsExamples = reactive<ICard[]>([
+    // 智慧园区
+    {
+      key: 0,
+      title: '智慧园区',
+      img: inDeveloping,
+      desc: '智慧园区，未来园区发展方向',
+      path: 'SmartParks'
+    },
     {
       key: 1,
       title: '智慧工厂',
       img: smartFactorySmall,
-      desc: '智慧工厂，可实时监测最新状态，元宇宙漫游',
+      desc: '智慧工厂，可实时监测最新状态',
       path: 'SmartFactory'
     },
     {
