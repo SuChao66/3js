@@ -63,7 +63,7 @@ const init = () => {
   renderer = mRenderer
   // 添加性能监视器
   if (useStatusByEnv()) {
-    // statusRef.value?.appendChild(mStatus.dom)
+    statusRef.value?.appendChild(mStatus.dom)
   }
 }
 
@@ -99,6 +99,9 @@ const initModel = async () => {
           }
         }
       })
+      // 创建光墙
+      // const lightWall = useLightWall({})
+      // city.add(lightWall)
       model.add(city)
     },
     (xhr) => {
