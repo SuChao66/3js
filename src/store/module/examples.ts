@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 // 导入类型
 import type { ICard } from '@/baseui/SCard/types'
 // 导入图片
+import smartParks from '@/assets/images/examples/smart-parks.png' // 智慧园区
 import smartFactorySmall from '@/assets/images/examples/smart-factory-small.png' // 智慧工厂
 import smartTollBoothsSmall from '@/assets/images/examples/smart-toll-booths-small.png' // 智慧收费站
 import smartCityShanghai from '@/assets/images/examples/3d-smart-city-shanghai.png' // 智慧城市-上海外滩
@@ -20,6 +21,7 @@ import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾�
 import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
 import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
+import earth from '@/assets/images/examples/earth.png' // 地球
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -29,7 +31,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 0,
       title: '智慧园区',
-      img: inDeveloping,
+      img: smartParks,
       desc: '智慧园区，未来园区发展方向',
       path: 'SmartParks'
     },
@@ -176,7 +178,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 1,
       title: '地球可视化',
-      img: inDeveloping,
+      img: earth,
       desc: '使用Cesium实现地球可视化',
       path: 'Earth'
     }

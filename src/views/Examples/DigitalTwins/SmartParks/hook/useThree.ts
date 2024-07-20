@@ -7,7 +7,8 @@ import {
   useRenderer,
   useControls,
   useHdr,
-  useLights
+  useLights,
+  useCSS3DRenderer
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -50,14 +51,19 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.enablePan = false
   controls.enableZoom = true
   // 限制缩放大小
-  controls.maxDistance = 20
-  controls.minDistance = 5
+  controls.maxDistance = 800
+  controls.minDistance = 100
+  // 限制缩放大小
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
+  // 1.9.创建css3dRender
+  const css3Renderer = useCSS3DRenderer()
 
   return {
     scene,
     camera,
     renderer,
     controls,
-    status
+    status,
+    css3Renderer
   }
 }
