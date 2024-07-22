@@ -1,5 +1,7 @@
 // 导入类型
 import type { RouteRecordRaw } from 'vue-router'
+// 元宇宙
+import { MataverseRoutes } from './mataverse'
 // 数字孪生
 import { DigitalTwinsRoutes } from './digitalTwins'
 // 3D展览
@@ -12,6 +14,7 @@ import { ShadersRoutes } from './shaders'
 import { CesiumRoutes } from './cesium'
 
 const exampleRoutes: Array<RouteRecordRaw> = [
+  ...MataverseRoutes,
   ...DigitalTwinsRoutes,
   ...ExhibitionRoutes,
   ...VisualizationRoutes,
