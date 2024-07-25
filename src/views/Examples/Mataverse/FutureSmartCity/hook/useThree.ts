@@ -8,7 +8,7 @@ import {
   useControls,
   useHdr,
   useLights,
-  useCSS3DRenderer
+  useAxesHelper
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -27,6 +27,8 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   })
   // 1.3.添加光照
   initAmbientLight({ scene, density: 0.6 })
+  // 1.4.辅助器
+  useAxesHelper({ scene })
   // 1.5.创建相机
   const camera = initPerspectiveCamera({
     fov: 45,
@@ -44,26 +46,11 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   renderer.toneMappingExposure = 2
   // 1.7.初始化性能监视器
   const status = useStatus()
-  // 1.8.初始化相机控件
-  const controls = initControls({ camera, renderer })
-  // 开启缓动动画
-  controls.enableDamping = true
-  controls.enablePan = false
-  controls.enableZoom = true
-  // 限制缩放大小
-  controls.maxDistance = 800
-  controls.minDistance = 100
-  // 限制缩放大小
-  controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
-  // 1.9.创建css3dRender
-  const css3Renderer = useCSS3DRenderer()
 
   return {
     scene,
     camera,
     renderer,
-    controls,
-    status,
-    css3Renderer
+    status
   }
 }
