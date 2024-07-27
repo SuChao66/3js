@@ -6,6 +6,8 @@
     <transition name="fade">
       <SLoading v-if="isLoading" :currentProgress="currentProgress" />
     </transition>
+    <!-- 遮罩层 -->
+    <STip v-if="isShowTip" @handleStart="handleStart" />
     <!-- canvas画布 -->
     <canvas id="webgl"></canvas>
   </div>
@@ -28,9 +30,17 @@ import {
   useGLTFModel,
   useOctree
 } from '@/hooks'
-import { useThree } from './hook'
+import {
+  useThree,
+  useVideoPlane,
+  useCanvasPlane,
+  usePortals,
+  useVideotext,
+  useMusic
+} from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
+import STip from './components/STip/index.vue'
 // 导入类型
 import type { IActions, IKeyStates } from './types'
 // 导入常量
@@ -45,6 +55,8 @@ const { width, height } = useWindowSize()
 const statusRef = ref<HTMLDivElement | null>(null)
 // 是否加载进度条
 const isLoading = ref<boolean>(true)
+// 是否展示操作提示
+const isShowTip = ref<boolean>(false)
 // 模型加载进度
 const currentProgress = ref<number>(0)
 // 请求动画帧
@@ -70,6 +82,14 @@ const keyStates: IKeyStates = {
   Space: false,
   isDown: false
 }
+// 传送门坐标
+const portalsPosition = new THREE.Vector3(0, -0.5, 0)
+// 音乐喷泉光阵坐标
+const lightCirclePosition = new THREE.Vector3(-4.8, -0.5, 18)
+// 触发position事件数组
+const eventPositionList: any[] = []
+// 视频文本提示数组
+const textVideoArrays: any[] = []
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -83,7 +103,12 @@ let scene: THREE.Scene, // 场景
   player: THREE.Object3D, // 玩家
   mixer: THREE.AnimationMixer, // 动画混合器
   activeAction: THREE.AnimationAction, // 当前执行的机器人动作
-  cameraEmptyBox: THREE.Object3D // 相机的父元素
+  cameraEmptyBox: THREE.Object3D, // 相机的父元素
+  portals: THREE.Group, // 传送门
+  lightCircle: THREE.Mesh, // 音乐喷泉光泉
+  canvasPlane: any, // 音乐喷泉提示信息(图片)
+  textVideoPlane: any, // 音乐喷泉提示信息(视频)
+  musicGroup: any // 音乐载体
 
 // 初始化
 const init = () => {
@@ -103,6 +128,48 @@ const init = () => {
   }
 }
 
+// 开始游戏
+const handleStart = () => {
+  // 关闭遮罩层
+  isShowTip.value = false
+  // 打开传送门
+  portals.visible = true
+  // 显示人物
+  setTimeout(() => {
+    player.visible = true
+  }, 1000)
+  // 将音乐喷泉光阵加入位置数组中
+  onPosition(
+    lightCirclePosition,
+    handlePlayerInFountain,
+    handlePlayerOutFountain
+  )
+}
+
+// 玩家进入音乐喷泉
+const handlePlayerInFountain = async () => {
+  console.log('进入光圈')
+  lightCircle.visible = false
+  // canvasPlane.visible = true
+  textVideoPlane.visible = true
+  // 播放音频
+  if (!musicGroup) {
+    musicGroup = (await useMusic({
+      position: lightCirclePosition.setY(-1).setZ(20),
+      path: './voice/gnzw.mp3'
+    })) as any
+    model.add(musicGroup.mesh)
+  }
+}
+
+// 玩家离开音乐喷泉
+const handlePlayerOutFountain = () => {
+  console.log('离开光圈')
+  lightCircle.visible = true
+  // canvasPlane.visible = false
+  textVideoPlane.visible = false
+}
+
 // 初始化玩家
 const initPlayer = () => {
   player = new THREE.Object3D()
@@ -110,6 +177,8 @@ const initPlayer = () => {
   scene.add(player)
   // 添加相机
   addCamera()
+  // 默认不展示机器人
+  player.visible = false
 }
 
 // 将相机添加至玩家，实现跟随效果
@@ -134,12 +203,44 @@ const addCamera = () => {
 }
 
 // 加载模型
-const initModel = () => {
+const initModel = async () => {
   model = new THREE.Group()
   scene.add(model)
 
   // 1.加载场景模型
   initSceneModel()
+  // 2.创建传送门
+  portals = usePortals({
+    videoSrc: './video/lightCircle.mp4',
+    position: portalsPosition,
+    size: new THREE.Vector2(2, 2)
+  })
+  model.add(portals)
+  // 3.添加喷泉旁的光阵视频纹理
+  lightCircle = useVideoPlane({
+    videoSrc: './video/lightCircle2.mp4',
+    position: lightCirclePosition,
+    size: new THREE.Vector2(5, 3)
+  })
+  model.add(lightCircle)
+  // 4.添加喷泉旁的提示信息
+  canvasPlane = await useCanvasPlane({
+    position: lightCirclePosition.setY(1.3).setZ(20),
+    euler: new THREE.Euler(0, Math.PI, 0),
+    imageSrc: './textures/chat.png',
+    text: '听首音乐放松一下吧'
+  })
+  // model.add(canvasPlane)
+  // 5.视频背景提示信息
+  const textVideo = useVideotext({
+    videoSrc: './video/chatFrame.mp4',
+    position: lightCirclePosition.setY(1.3).setZ(20),
+    euler: new THREE.Euler(0, Math.PI, 0),
+    text: '听首音乐放松一下吧'
+  })
+  textVideoPlane = textVideo.mesh
+  model.add(textVideoPlane)
+  textVideoArrays.push(textVideo)
 }
 
 // 加载场景模型
@@ -177,7 +278,7 @@ const initSceneModel = async () => {
 const initRobotModel = async () => {
   const gltf: any = await useGLTFModel({ path: './models/xRobot.glb' })
   const robot = gltf.scene
-  robot.position.set(0, -0.75, 0)
+  robot.position.set(0, -0.6, 0)
   // 可视化robot
   player.add(robot)
   // 处理动画
@@ -244,6 +345,7 @@ const controlPlayer = (delta: number) => {
   // space：跳跃
   if (keyStates['Space']) {
     playerVelocity.y = 5
+    fadeToAction('idle')
   }
 }
 
@@ -277,6 +379,7 @@ const updatePlayer = (delta: number) => {
 // 碰撞检测
 const playerCollisions = () => {
   const result = worldOctree && worldOctree.capsuleIntersect(capsule)
+  // 默认不在地面上
   playerOnFloor = false
   if (result) {
     playerOnFloor = result.normal.y > 0
@@ -329,6 +432,7 @@ const fadeToAction = (actionName: string) => {
   }
 }
 
+// 重置玩家
 const resetPlayer = () => {
   if (player.position.y < -20) {
     // 重置胶囊体位置
@@ -363,11 +467,14 @@ const handleKeyUp = (event: any) => {
 // 鼠标事件
 // 鼠标按下，进入指针锁定
 const handleMouseDown = () => {
+  if (isShowTip.value) return
   // 锁定鼠标指针
   document.body.requestPointerLock()
 }
 // 鼠标移动，修改人物视角
 const handleMouseMove = (event: any) => {
+  // 判断是否处于鼠标指针锁定状态
+  if (!document.pointerLockElement) return
   // 左右视线
   player.rotation.y -= event.movementX * 0.003
   // 上下视线
@@ -377,6 +484,44 @@ const handleMouseMove = (event: any) => {
   } else if (cameraEmptyBox.rotation.x < Math.PI / 20) {
     cameraEmptyBox.rotation.x = Math.PI / 20
   }
+}
+
+// 监听位置
+const onPosition = (
+  position: THREE.Vector3,
+  inCallback: any,
+  outCallback: any,
+  radius = 2
+) => {
+  const newPosition = position.clone()
+  eventPositionList.push({
+    position: newPosition,
+    inCallback,
+    outCallback,
+    isInner: false,
+    radius
+  })
+}
+
+// 位置触发
+const emitPositionEvent = () => {
+  eventPositionList.forEach((item) => {
+    // 计算玩家距离某个点的距离，判断是否触发事件
+    const distanceToSquared = player.position.distanceToSquared(item.position)
+    // 进入
+    if (
+      distanceToSquared < Math.pow(item.radius, 2) &&
+      item.isInner === false
+    ) {
+      item.isInner = true
+      item.inCallback && item.inCallback()
+    }
+    // 离开
+    if (distanceToSquared > Math.pow(item.radius, 2) && item.isInner === true) {
+      item.isInner = false
+      item.outCallback && item.outCallback()
+    }
+  })
 }
 
 // 渲染
@@ -391,12 +536,22 @@ const animate = () => {
   status && status.update()
   // 更新动画时间
   mixer && mixer.update(delta)
-  // 控制人物行走
-  controlPlayer(delta)
-  // 更新玩家位置
-  updatePlayer(delta)
-  // 重置玩家位置
-  resetPlayer()
+  if (player.visible) {
+    // 控制人物行走
+    controlPlayer(delta)
+    // 更新玩家位置
+    updatePlayer(delta)
+    // 重置玩家位置
+    resetPlayer()
+    // 判断玩家的位置
+    emitPositionEvent()
+    // 更新视频提示信息背景
+    if (textVideoArrays.length > 0) {
+      for (let i = 0; i < textVideoArrays.length; i++) {
+        textVideoArrays[i].update()
+      }
+    }
+  }
 }
 
 // 监听窗口的变化
@@ -418,6 +573,16 @@ watch(
   () => [width, height],
   ([newWidth, newHeight]) => {
     handleResize(newWidth.value, newHeight.value)
+  },
+  { immediate: true, deep: true }
+)
+
+watch(
+  () => isLoading.value,
+  (newVal) => {
+    if (!newVal) {
+      isShowTip.value = true
+    }
   },
   { immediate: true, deep: true }
 )
@@ -457,6 +622,9 @@ onUnmounted(() => {
   // 移除鼠标事件
   document.removeEventListener('mousedown', handleMouseDown)
   document.removeEventListener('mousemove', handleMouseMove)
+  // 停止音乐播放
+  console.log(musicGroup.sound)
+  musicGroup.sound.stop()
 })
 </script>
 

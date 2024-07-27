@@ -5,17 +5,14 @@ import {
   useCamera,
   useStatus,
   useRenderer,
-  useControls,
   useHdr,
-  useLights,
-  useAxesHelper
+  useLights
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
 
 export const useThree = (canvas: HTMLCanvasElement) => {
   const { initPerspectiveCamera } = useCamera()
-  const { initControls } = useControls()
   const { initAmbientLight } = useLights()
 
   // 1.1.创建场景
@@ -27,8 +24,6 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   })
   // 1.3.添加光照
   initAmbientLight({ scene, density: 0.6 })
-  // 1.4.辅助器
-  useAxesHelper({ scene })
   // 1.5.创建相机
   const camera = initPerspectiveCamera({
     fov: 45,

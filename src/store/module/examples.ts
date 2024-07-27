@@ -22,6 +22,7 @@ import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
 import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import earth from '@/assets/images/examples/earth.png' // 地球
+import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -97,7 +98,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 1,
       title: '未来智慧城',
-      img: inDeveloping,
+      img: futureSmartCity,
       desc: '在未来智慧城中进行3D漫游',
       path: 'FutureSmartCity'
     }

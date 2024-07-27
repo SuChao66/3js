@@ -1,1 +1,6 @@
 export * from './useThree'
+export * from './useVideoPlane'
+export * from './useCanvasPlane'
+export * from './usePortals'
+export * from './useVideotext'
+export * from './useMusic'
