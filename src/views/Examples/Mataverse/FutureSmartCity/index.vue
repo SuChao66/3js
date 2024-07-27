@@ -623,8 +623,7 @@ onUnmounted(() => {
   document.removeEventListener('mousedown', handleMouseDown)
   document.removeEventListener('mousemove', handleMouseMove)
   // 停止音乐播放
-  console.log(musicGroup.sound)
-  musicGroup.sound.stop()
+  musicGroup && musicGroup.sound.stop()
 })
 </script>
 
