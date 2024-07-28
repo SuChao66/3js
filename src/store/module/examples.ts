@@ -23,25 +23,18 @@ import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import earth from '@/assets/images/examples/earth.png' // 地球
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
-import inDeveloping from '@/assets/images/in-developing.png'
+// import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
   const digitalTwinsExamples = reactive<ICard[]>([
     // 智慧园区
     {
-      key: 0,
+      key: 1,
       title: '智慧园区',
       img: smartParks,
       desc: '智慧园区，未来园区发展方向',
       path: 'SmartParks'
-    },
-    {
-      key: 1,
-      title: '智慧工厂',
-      img: smartFactorySmall,
-      desc: '智慧工厂，可实时监测最新状态',
-      path: 'SmartFactory'
     },
     {
       key: 2,
@@ -52,17 +45,17 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 3,
-      title: '智慧小区',
-      img: smartCommunitySmall,
-      desc: '智慧小区，邻里和睦',
-      path: 'SmartCommunity'
-    },
-    {
-      key: 4,
       title: '魔都_上海外滩',
       img: smartCityShanghai,
       desc: '外滩美景，欣赏万国建筑',
       path: 'SmartCityShangHai'
+    },
+    {
+      key: 4,
+      title: '智慧小区',
+      img: smartCommunitySmall,
+      desc: '智慧小区，邻里和睦',
+      path: 'SmartCommunity'
     },
     {
       key: 5,
@@ -101,6 +94,13 @@ const useExampleStore = defineStore('examples', () => {
       img: futureSmartCity,
       desc: '在未来智慧城中进行3D漫游',
       path: 'FutureSmartCity'
+    },
+    {
+      key: 2,
+      title: '智慧工厂',
+      img: smartFactorySmall,
+      desc: '智慧工厂，可实时监测最新状态',
+      path: 'SmartFactory'
     }
   ])
   // 3.3D展览

@@ -53,7 +53,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   controls.minDistance = 0
   // 最大仰角
   controls.minPolarAngle = 0
-  controls.maxPolarAngle = Math.PI / 2
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
   // 2.10.创建css2D渲染器
   const css2Renderer = useCSS2DRenderer()
 

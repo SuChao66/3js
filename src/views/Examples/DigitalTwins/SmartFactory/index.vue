@@ -42,6 +42,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // 导入draco解压器
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+// 导入八叉树
+import { Octree } from 'three/examples/jsm/math/Octree.js'
+// 导入胶囊
+import { Capsule } from 'three/examples/jsm/math/Capsule.js'
 // 导入CSS2D
 import {
   CSS2DObject,
@@ -50,7 +54,13 @@ import {
 // 导入动画库
 import * as TWEEN from '@tweenjs/tween.js'
 // 导入hooks
-import { useWindowSize, usePointer, useCameraTween } from '@/hooks'
+import {
+  useWindowSize,
+  useOctree,
+  usePointer,
+  useCameraTween,
+  useProgress
+} from '@/hooks'
 import { useThree } from './hook/useThree.ts'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
@@ -63,6 +73,11 @@ import { useStatusByEnv } from '@/hooks'
 import { cunchuInfo } from './constants'
 // 导入配置文件
 import type { IKeyStates } from './types'
+// 导入常量
+import {
+  firstPersonPerspectiveCamera,
+  thirdPersonPerspectiveCamera
+} from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -107,10 +122,13 @@ let scene: THREE.Scene | null, // 场景
   planeClipAction: THREE.AnimationAction, // 无人机动画
   idleClipAction: THREE.AnimationAction, // 休息
   walkClipAction: THREE.AnimationAction, // 走路
+  runClipAction: THREE.AnimationAction, // 跑步
   spriteGroup: THREE.Group, // 精灵模型
   selectModel: THREE.Object3D, // 选择的模型
   cameraPos: THREE.Vector3, // 相机初始位置
-  controlsTarget: THREE.Vector3 // 相机初始target
+  controlsTarget: THREE.Vector3, // 相机初始target
+  worldOctree: Octree, // 世界八叉树
+  capsule: Capsule // 胶囊体
 // 当前选择的存储罐
 const currentSelectModel = ref<string>('')
 // tag标签
@@ -123,7 +141,7 @@ const flyInfo = {
 // 无人机的停放位置
 const flyPosition = new THREE.Vector3(-25, 0, 10)
 // 玩家的位置
-const playerPosition = new THREE.Vector3(-15, 0, 30)
+const playerPosition = new THREE.Vector3(-15, -0.675, 30)
 const keyStates: IKeyStates = {
   // 使用W、A、S、D按键来控制前、后、左、右运动
   // false表示没有按下，true表示按下状态
@@ -132,21 +150,32 @@ const keyStates: IKeyStates = {
   S: false,
   D: false
 }
+// 工厂碰撞组
+const factoryPlaneArr = ['路面', '地面']
+const factoryPlaneGroupArr = [
+  '大货车',
+  '大货车1',
+  '大货车2',
+  '仓库',
+  '设备A',
+  '设备B'
+]
+const planeGroup = new THREE.Group()
 // 定义玩家漫游的速度
 const v = new THREE.Vector3(0, 0, 0)
-// 玩家最大速度
-const vMax = 5.5
 // 玩家加速度
 const a = 12
 // 定义地面摩擦力系数（阻尼系数）
-const damping = -0.06
-// 第三人称视角相机位置
-const thirdCameraPosition = new THREE.Vector3(0, 1.6, 7.5)
+const damping = -0.15
+// 重力
+const gravity = -9.8
+// 玩家是否在地面上
+let playerOnFloor = false
+// 是否第三人称
+let isThirdView = true
 // 俯仰角度范围
-const angleMin = THREE.MathUtils.degToRad(-15)
+const angleMin = THREE.MathUtils.degToRad(-1)
 const angleMax = THREE.MathUtils.degToRad(15)
-// true表示第三人称，false表示第一人称
-const viewBool = ref<boolean>(true)
 
 onMounted(() => {
   const {
@@ -167,8 +196,6 @@ onMounted(() => {
   css2Renderer = mCss2Renderer
   cameraPos = mCameraPos
   controlsTarget = mControlsTarget
-  // 将相机添加到cameraGroup中
-  cameraGroup.add(camera)
   // 添加性能监视器
   if (useStatusByEnv()) {
     statusRef.value?.appendChild(mStatus.dom)
@@ -183,6 +210,13 @@ onMounted(() => {
   initModel()
   // 播放动画
   animate()
+  // 加载进度
+  useProgress((progress: number) => {
+    currentProgress.value = progress
+    if (progress === 100) {
+      isLoading.value = false
+    }
+  })
 })
 
 // 加载模型
@@ -191,34 +225,21 @@ const initModel = () => {
   dracoLoader.setDecoderPath('./draco/')
   const loader = new GLTFLoader()
   loader.setDRACOLoader(dracoLoader)
-  loader.load(
-    './models/factory.glb',
-    (gltf) => {
-      // 保存模型
-      factory = gltf.scene
-      model!.add(factory)
-      // 播放关键帧动画
-      mixer = new THREE.AnimationMixer(gltf.scene)
-      // 获取gltf.animations[0]的第一个clip动画对象
-      clipAction = mixer.clipAction(gltf.animations[0])
-      // 播放动画
-      clipAction.play()
-      // 暂停状态
-      clipAction.paused = true
-    },
-    (xhr) => {
-      currentProgress.value = Number(Math.round((xhr.loaded / xhr.total) * 100))
-      if (currentProgress.value === 100) {
-        // 加载无人机模型
-        initPlaneModel()
-        // 加载人模型
-        initHumanModel()
-        setTimeout(() => {
-          isLoading.value = false
-        }, 1000)
-      }
-    }
-  )
+  loader.load('./models/factory.glb', (gltf) => {
+    // 保存模型
+    factory = gltf.scene
+    model!.add(factory)
+    // 处理卡车动画
+    handleCarAnimation(gltf)
+    // 处理工厂模型，确定碰撞组
+    handlePlane(factory)
+    // 创建物理世界
+    createWorldOctree()
+    // 加载无人机模型
+    initPlaneModel()
+    // 加载人模型
+    initHumanModel()
+  })
 }
 
 // 加载无人机
@@ -245,40 +266,92 @@ const initHumanModel = () => {
   dracoLoader.setDecoderPath('./draco/')
   const loader = new GLTFLoader()
   loader.setDRACOLoader(dracoLoader)
-  loader.load('./models/soldiers.glb', (gltf) => {
-    // 保存玩家模型
-    player = gltf.scene
+  loader.load('./models/xRobot.glb', (gltf) => {
+    player = new THREE.Group()
+    // 设置玩家的大小和位置
+    player.position.copy(playerPosition)
     // 添加至场景中
     model!.add(player)
-    // 设置玩家的大小和位置
-    player.scale.set(2, 2, 2)
-    player.position.copy(playerPosition)
     scene!.add(model!)
-    // 获取人的关键帧动画
-    const animations = gltf.animations
-    // 创建玩家动画播放器
-    playerMixer = new THREE.AnimationMixer(gltf.scene)
-    // 创建动画对象
-    idleClipAction = playerMixer.clipAction(animations[0])
-    walkClipAction = playerMixer.clipAction(animations[3])
-    // 播放动画
-    idleClipAction.play()
-    walkClipAction.play()
-    // 通过权重来设置动画
-    idleClipAction.weight = 1.0
-    walkClipAction.weight = 0.0
-    // 默认下雨效果
-    handleEnvironment('rain')
+    // 保存机器人模型
+    const robot = gltf.scene
+    robot.position.y -= 0.6
+    // 可视化robot
+    player.add(robot)
+    // 处理机器人动作
+    handleRobotAnimation(gltf)
   })
 }
 
+// 处理卡车动画
+const handleCarAnimation = (gltf: any) => {
+  // 播放关键帧动画
+  mixer = new THREE.AnimationMixer(gltf.scene)
+  // 获取gltf.animations[0]的第一个clip动画对象
+  clipAction = mixer.clipAction(gltf.animations[0])
+  // 播放动画
+  clipAction.play()
+  // 暂停状态
+  clipAction.paused = true
+}
+
+// 处理工厂模型碰撞组
+const handlePlane = (factory: any) => {
+  factory.traverse((child: any) => {
+    if (child.isObject3D && factoryPlaneGroupArr.includes(child.name)) {
+      planeGroup.add(child.clone())
+    }
+    if (child.isMesh && factoryPlaneArr.includes(child.name)) {
+      planeGroup.add(child.clone())
+    }
+  })
+}
+
+// 创建物理世界
+const createWorldOctree = () => {
+  const physical = useOctree({
+    planeGroup,
+    start: new THREE.Vector3(-15, 0.35, 30),
+    end: new THREE.Vector3(-15, 1, 30)
+  })
+  worldOctree = physical.worldOctree
+  capsule = physical.capsule
+}
+
+// 处理机器人动画
+const handleRobotAnimation = (gltf: any) => {
+  // 获取人的关键帧动画
+  const animations = gltf.animations
+  // 创建玩家动画播放器
+  playerMixer = new THREE.AnimationMixer(gltf.scene)
+  // 创建动画对象
+  idleClipAction = playerMixer.clipAction(animations[0])
+  walkClipAction = playerMixer.clipAction(animations[6])
+  runClipAction = playerMixer.clipAction(animations[3])
+  // 播放动画
+  idleClipAction.play()
+  walkClipAction.play()
+  runClipAction.play()
+  // 通过权重来设置动画
+  idleClipAction.weight = 1.0
+  walkClipAction.weight = 0.0
+  runClipAction.weight = 0.0
+}
+
+// 切换人物动作
 const changeAction = (name: string) => {
   if (name === 'idle') {
     idleClipAction.weight = 1.0
     walkClipAction.weight = 0.0
+    runClipAction.weight = 0.0
   } else if (name === 'walk') {
     idleClipAction!.weight = 0.0
     walkClipAction!.weight = 1.0
+    runClipAction.weight = 0.0
+  } else {
+    idleClipAction!.weight = 0.0
+    walkClipAction!.weight = 0.0
+    runClipAction.weight = 1.0
   }
 }
 
@@ -321,62 +394,10 @@ const animate = () => {
       }
     })
   }
-  // 玩家宇宙漫游
-  // 通过速度大小，设置相应的动画
-  if (isRoaming.value) {
-    const vl = v.length()
-    if (vl < 0.2) {
-      changeAction('idle')
-    } else {
-      changeAction('walk')
-    }
-    console.log('速度大小', v.length())
-    if (Math.floor(v.length()) <= vMax) {
-      // 加速前进
-      if (keyStates.W) {
-        // 假设w键对应的运动方向为z的负半轴
-        // const front = new THREE.Vector3(0, 0, -1);
-        let front = new THREE.Vector3()
-        player!.getWorldDirection(front) // 默认方向与z轴正方向平行
-        // 由于模型的初始方向是沿着z轴负方向的，所以此处获取的方向需要取反
-        front.multiplyScalar(-1)
-        // delta时间短内，速度的变化量，v = v0 + at
-        // 初始速度 + 速度的变化量
-        v.add(front.multiplyScalar(a * delta))
-      } else if (keyStates.S) {
-        // 后退
-        // 假设S键对应的运动方向为z的正半轴(S按键和W方向相反)
-        // const front = new THREE.Vector3(0, 0, 1);
-        const front = new THREE.Vector3()
-        player!.getWorldDirection(front)
-        // delta时间短内，速度的变化量，v = v0 + at
-        // 初始速度 + 速度的变化量
-        v.add(front.multiplyScalar(a * delta))
-      } else if (keyStates.A) {
-        // 往左
-        const front = new THREE.Vector3() // 前方
-        player!.getWorldDirection(front)
-        const up = new THREE.Vector3(0, 1, 0) // 上方向
-        const left = front.cross(up)
-        v.add(left.multiplyScalar(a * delta))
-      } else if (keyStates.D) {
-        // 往右
-        const front = new THREE.Vector3() // 前方
-        player!.getWorldDirection(front)
-        const up = new THREE.Vector3(0, 1, 0) // 上方向
-        const right = up.cross(front)
-        v.add(right.multiplyScalar(a * delta))
-      }
-      // 阻尼设置
-      // v = v * (1-0.04) = v * (1 + damping) = v + v * damping
-      // .addScaledVector(v, s)：将所传入的v与s相乘所得的乘积和这个向量相加。
-      v.addScaledVector(v, damping)
-      // delta时间段内位置改变量
-      const deltaPos = v.clone().multiplyScalar(delta)
-      // 原位置加上改变的位移量
-      player && player!.position.add(deltaPos)
-    }
-  }
+  // 玩家宇宙漫游，更新玩家位置
+  updatePlayer(delta)
+  // 重置玩家
+  resetPlayer()
 }
 
 // 播放卡车动画
@@ -524,12 +545,21 @@ const handleRoaming = () => {
     // 打开漫游
     isRoaming.value = true
     // 将相机添加到玩家的模型中
+    if (isThirdView) {
+      camera.position.copy(thirdPersonPerspectiveCamera)
+    } else {
+      camera.position.copy(firstPersonPerspectiveCamera)
+    }
+    // 设置相机的朝向
+    const front = new THREE.Vector3(0, 0, 0)
+    player!.getWorldDirection(front)
+    const target = front.normalize().multiplyScalar(2)
+    camera.lookAt(target)
+    // 更新相机投影矩阵
+    camera.updateProjectionMatrix()
+    // 添加至玩家模型中，实现跟随效果
+    cameraGroup.add(camera)
     player?.add(cameraGroup)
-    // 获取玩家的位置
-    const playerWorldPosition = new THREE.Vector3()
-    player?.getWorldPosition(playerWorldPosition)
-    // 将相机移动的合适的位置（默认第三人称）
-    createCameraTween(thirdCameraPosition, playerWorldPosition)
     // 进入指针锁定模式
     document.body.requestPointerLock()
   }
@@ -676,15 +706,6 @@ document.addEventListener('keydown', (event) => {
   if (event.code === 'KeyA') keyStates.A = true
   if (event.code === 'KeyS') keyStates.S = true
   if (event.code === 'KeyD') keyStates.D = true
-  // 第一人称和第三人称切换
-  if (event.code === 'KeyV') {
-    if (viewBool.value) {
-      camera.position.z = 7.5
-    } else {
-      camera.position.z = -0.5
-    }
-    viewBool.value = !viewBool.value
-  }
 })
 
 document.addEventListener('keyup', (event) => {
@@ -692,6 +713,16 @@ document.addEventListener('keyup', (event) => {
   if (event.code === 'KeyA') keyStates.A = false
   if (event.code === 'KeyS') keyStates.S = false
   if (event.code === 'KeyD') keyStates.D = false
+  // 第一人称和第三人称切换
+  if (event.code === 'KeyV') {
+    isThirdView = !isThirdView
+    if (isThirdView) {
+      camera.position.z -= 6
+    } else {
+      camera.position.z += 6
+    }
+    camera.updateProjectionMatrix()
+  }
 })
 
 // 鼠标移动事件
@@ -712,6 +743,102 @@ document.addEventListener('mousemove', (event) => {
     }
   }
 })
+
+// 更新玩家位置
+const updatePlayer = (delta: number) => {
+  // 通过速度大小，设置相应的动画
+  if (isRoaming.value) {
+    // 加速前进
+    if (keyStates.W) {
+      let front = new THREE.Vector3()
+      player!.getWorldDirection(front) // 默认方向与z轴正方向平行
+      // delta时间短内，速度的变化量，v = v0 + at
+      // 初始速度 + 速度的变化量
+      v.add(front.multiplyScalar(a * delta))
+    } else if (keyStates.S) {
+      // 后退
+      let front = new THREE.Vector3()
+      player!.getWorldDirection(front)
+      front.multiplyScalar(-1)
+      // delta时间短内，速度的变化量，v = v0 + at
+      // 初始速度 + 速度的变化量
+      v.add(front.multiplyScalar(a * delta))
+    } else if (keyStates.A) {
+      // 往左
+      let front = new THREE.Vector3() // 前方
+      player!.getWorldDirection(front)
+      front.multiplyScalar(-1)
+      const up = new THREE.Vector3(0, 1, 0) // 上方向
+      const left = front.cross(up)
+      v.add(left.multiplyScalar(a * delta))
+    } else if (keyStates.D) {
+      // 往右
+      const front = new THREE.Vector3() // 前方
+      player!.getWorldDirection(front)
+      const up = new THREE.Vector3(0, 1, 0) // 上方向
+      const right = front.cross(up)
+      v.add(right.multiplyScalar(a * delta))
+    }
+    // 阻尼设置
+    // v = v * (1-0.04) = v * (1 + damping) = v + v * damping
+    // .addScaledVector(v, s)：将所传入的v与s相乘所得的乘积和这个向量相加。
+    if (playerOnFloor) {
+      v.y = 0
+      v.addScaledVector(v, damping)
+    } else {
+      v.y += delta * gravity
+    }
+    // delta时间段内位置改变量
+    const deltaPos = v.clone().multiplyScalar(delta)
+    // 修改胶囊体的位置
+    capsule && capsule.translate(deltaPos)
+    // 同步修改玩家的位置
+    const capsulePosition = new THREE.Vector3(0, 0, 0)
+    capsule && capsule.getCenter(capsulePosition)
+    player && player.position.copy(capsulePosition)
+    // 碰撞检测
+    playerCollisions()
+    // 切换人物动作
+    switchPlayerAction()
+  }
+}
+
+// 碰撞检测
+const playerCollisions = () => {
+  const result = worldOctree && worldOctree.capsuleIntersect(capsule)
+  // 默认不在地面上
+  playerOnFloor = false
+  if (result) {
+    playerOnFloor = result.normal.y > 0
+    capsule.translate(result.normal.multiplyScalar(result.depth))
+  }
+}
+
+// 切换玩家动作
+const switchPlayerAction = () => {
+  if (
+    Math.abs(v.x) + Math.abs(v.z) > 0.1 &&
+    Math.abs(v.x) + Math.abs(v.z) <= 7
+  ) {
+    changeAction('walk')
+  } else if (Math.abs(v.x) + Math.abs(v.z) > 7) {
+    changeAction('run')
+  } else {
+    changeAction('idle')
+  }
+}
+
+// 重置玩家位置
+const resetPlayer = () => {
+  if (player && player.position.y < -20) {
+    // 重置胶囊体位置
+    capsule.start.set(-15, 0.35, 30)
+    capsule.end.set(-15, 1, 30)
+    capsule.radius = 0.35
+    // 重置速度
+    v.set(0, 0, 0)
+  }
+}
 
 // 创建相机动画
 const createCameraTween = (endPos: THREE.Vector3, endTarget: THREE.Vector3) => {
