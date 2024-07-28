@@ -2,7 +2,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const MataverseRoutes: Array<RouteRecordRaw> = [
-  // 1.粒子群效果
+  // 1.未来智慧城
   {
     name: 'FutureSmartCity',
     path: '/futureSmartCity',
@@ -11,6 +11,15 @@ const MataverseRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/Mataverse/FutureSmartCity/index.vue')
+  },
+  // 2.智慧工厂
+  {
+    name: 'SmartFactory',
+    path: '/smartFactory',
+    meta: {
+      title: 'SmartFactory'
+    },
+    component: () => import('@/views/Examples/Mataverse/SmartFactory/index.vue')
   }
 ]
 

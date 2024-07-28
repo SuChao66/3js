@@ -2,7 +2,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
-  // 0.智慧园区
+  // 1.智慧园区
   {
     name: 'SmartParks',
     path: '/smartParks',
@@ -11,16 +11,6 @@ const DigitalTwinsRoutes: Array<RouteRecordRaw> = [
     },
     component: () =>
       import('@/views/Examples/DigitalTwins/SmartParks/index.vue')
-  },
-  // 1.智慧工厂
-  {
-    name: 'SmartFactory',
-    path: '/smartFactory',
-    meta: {
-      title: 'SmartFactory'
-    },
-    component: () =>
-      import('@/views/Examples/DigitalTwins/SmartFactory/index.vue')
   },
   // 2.智慧收费站
   {
