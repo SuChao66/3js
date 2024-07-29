@@ -366,13 +366,9 @@ const updatePlayer = (delta: number) => {
   const playerMoveDis = playerVelocity.clone().multiplyScalar(delta)
   // 4.修改胶囊体的位置
   capsule && capsule.translate(playerMoveDis)
-  // 5.同步修改玩家的位置
-  const capsulePosition = new THREE.Vector3(0, 0, 0)
-  capsule && capsule.getCenter(capsulePosition)
-  player && player.position.copy(capsulePosition)
-  // 6.进行碰撞检测，result有值，表示碰撞检测到了
+  // 5.进行碰撞检测，result有值，表示碰撞检测到了
   playerCollisions()
-  // 7.切换玩家动作
+  // 6.切换玩家动作
   switchPlayerAction()
 }
 
@@ -383,7 +379,12 @@ const playerCollisions = () => {
   playerOnFloor = false
   if (result) {
     playerOnFloor = result.normal.y > 0
+    // 修改胶囊体的位置，使其不碰撞
     capsule.translate(result.normal.multiplyScalar(result.depth))
+    // 同步修改玩家的位置
+    const capsulePosition = new THREE.Vector3(0, 0, 0)
+    capsule && capsule.getCenter(capsulePosition)
+    player && player.position.copy(capsulePosition)
   }
 }
 

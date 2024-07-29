@@ -792,10 +792,6 @@ const updatePlayer = (delta: number) => {
     const deltaPos = v.clone().multiplyScalar(delta)
     // 修改胶囊体的位置
     capsule && capsule.translate(deltaPos)
-    // 同步修改玩家的位置
-    const capsulePosition = new THREE.Vector3(0, 0, 0)
-    capsule && capsule.getCenter(capsulePosition)
-    player && player.position.copy(capsulePosition)
     // 碰撞检测
     playerCollisions()
     // 切换人物动作
@@ -808,9 +804,15 @@ const playerCollisions = () => {
   const result = worldOctree && worldOctree.capsuleIntersect(capsule)
   // 默认不在地面上
   playerOnFloor = false
+  // result有值，表示与物体碰撞到了
   if (result) {
     playerOnFloor = result.normal.y > 0
+    // 移动capusle胶囊体，使其不碰撞
     capsule.translate(result.normal.multiplyScalar(result.depth))
+    // 同步修改玩家的位置
+    const capsulePosition = new THREE.Vector3(0, 0, 0)
+    capsule && capsule.getCenter(capsulePosition)
+    player && player.position.copy(capsulePosition)
   }
 }
 
