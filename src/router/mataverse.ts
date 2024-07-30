@@ -20,6 +20,24 @@ const MataverseRoutes: Array<RouteRecordRaw> = [
       title: 'SmartFactory'
     },
     component: () => import('@/views/Examples/Mataverse/SmartFactory/index.vue')
+  },
+  // 3.古墓丽影
+  {
+    name: 'TombRaider',
+    path: '/tombRaider',
+    meta: {
+      title: 'TombRaider'
+    },
+    component: () => import('@/views/Examples/Mataverse/TombRaider/index.vue')
+  },
+  // 4.迷宫
+  {
+    name: 'Migong',
+    path: '/migong',
+    meta: {
+      title: 'Migong'
+    },
+    component: () => import('@/views/Examples/Mataverse/Migong/index.vue')
   }
 ]
 

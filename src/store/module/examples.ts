@@ -23,7 +23,8 @@ import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import earth from '@/assets/images/examples/earth.png' // 地球
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
-// import inDeveloping from '@/assets/images/in-developing.png'
+import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
+import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
@@ -101,6 +102,20 @@ const useExampleStore = defineStore('examples', () => {
       img: smartFactorySmall,
       desc: '智慧工厂，可实时监测最新状态',
       path: 'SmartFactory'
+    },
+    {
+      key: 3,
+      title: '古堡传奇',
+      img: tombRdider,
+      desc: '中世纪的皇室贵族',
+      path: 'TombRaider'
+    },
+    {
+      key: 4,
+      title: '迷宫',
+      img: inDeveloping,
+      desc: '世界上最漫长的路',
+      path: 'Migong'
     }
   ])
   // 3.3D展览

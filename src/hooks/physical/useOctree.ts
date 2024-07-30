@@ -16,13 +16,15 @@ export const useOctree = ({
   planeGroup,
   start = new THREE.Vector3(0, 0.35, 0),
   end = new THREE.Vector3(0, 1, 0),
-  radius = 0.35
+  radius = 0.35,
+  scene
 }: {
   isShowHelper?: boolean
   planeGroup: THREE.Group
   start?: THREE.Vector3
   end?: THREE.Vector3
   radius?: number
+  scene?: THREE.Scene
 }) => {
   // 0.定义变量
   let octreeHelper
@@ -32,7 +34,8 @@ export const useOctree = ({
   worldOctree.fromGraphNode(planeGroup)
   // 3.创建一个octreeHelper
   if (isShowHelper) {
-    octreeHelper = new OctreeHelper(worldOctree, '0xffff00')
+    octreeHelper = new OctreeHelper(worldOctree, 0xffff00)
+    scene?.add(octreeHelper)
   }
   // 4.创建一个胶囊体
   const capsule = new Capsule(start, end, radius)
