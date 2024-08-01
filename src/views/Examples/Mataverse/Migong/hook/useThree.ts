@@ -6,8 +6,8 @@ import {
   useStatus,
   useRenderer,
   useHdr,
-  useLights,
-  useAxesHelper
+  useLights
+  // useAxesHelper
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -36,10 +36,10 @@ export const useThree = (canvas: HTMLCanvasElement) => {
     name: '平行光2'
   })
   // 1.4.辅助器
-  useAxesHelper({
-    scene,
-    size: 100
-  })
+  // useAxesHelper({
+  //   scene,
+  //   size: 100
+  // })
   // 1.5.创建相机
   const camera = initPerspectiveCamera({
     fov: 45,

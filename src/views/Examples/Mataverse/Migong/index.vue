@@ -28,9 +28,10 @@ import {
   useStatusByEnv,
   useProgress,
   useGLTFModel,
-  useOctree
+  useOctree,
+  useHowler
 } from '@/hooks'
-import { useThree } from './hook'
+import { useThree, useRunSound } from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STip from './components/STip/index.vue'
@@ -81,7 +82,9 @@ let scene: THREE.Scene, // 场景
   player: THREE.Object3D, // 玩家
   mixer: THREE.AnimationMixer, // 动画混合器
   cameraEmptyBox: THREE.Object3D, // 相机的父元素
-  activeAction: THREE.AnimationAction // 当前执行的机器人动作
+  activeAction: THREE.AnimationAction, // 当前执行的机器人动作
+  sound: any, // 玩家行走的声音
+  howler: any // 背景音乐
 
 // 初始化
 const init = () => {
@@ -102,18 +105,28 @@ const init = () => {
 }
 
 // 开始游戏
-const handleStart = () => {
+const handleStart = async () => {
   // 关闭遮罩层
   isShowTip.value = false
+  // 播放背景音乐
+  howler = (await useHowler({
+    src: './voice/bg_kongbu.mp3',
+    volume: 0.5
+  })) as any
+  howler.play()
 }
 
 // 初始化玩家
-const initPlayer = () => {
+const initPlayer = async () => {
   player = new THREE.Object3D()
   player.position.set(0, 0.85, 0)
   scene.add(player)
   // 添加相机
   addCamera()
+  // 创建玩家行走的声音源
+  sound = await useRunSound({ path: './voice/run.mp3' })
+  player.add(sound)
+  console.log(sound)
 }
 
 // 将相机添加至玩家，实现跟随效果
@@ -286,13 +299,19 @@ const playerCollisions = () => {
 const switchPlayerAction = () => {
   if (
     Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) > 0.1 &&
-    Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) <= 10
+    Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) <= 3
   ) {
     fadeToAction('walk')
-  } else if (Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) > 10) {
+  } else if (Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) > 3) {
     fadeToAction('run')
+    if (!sound.isPlaying) {
+      sound.play()
+    }
   } else {
     fadeToAction('idle')
+    if (sound.isPlaying) {
+      sound.stop()
+    }
   }
 }
 
@@ -462,6 +481,14 @@ onUnmounted(() => {
   // 移除鼠标事件
   document.removeEventListener('mousedown', handleMouseDown)
   document.removeEventListener('mousemove', handleMouseMove)
+  // 停止行走声音
+  if (sound && sound.isPlaying) {
+    sound.stop()
+  }
+  // 停止背景音乐
+  if (howler) {
+    howler.stop()
+  }
 })
 </script>
 

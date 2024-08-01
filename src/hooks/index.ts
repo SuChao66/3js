@@ -58,6 +58,7 @@ export * from './common/useSort'
 export * from './common/useMinMax'
 export * from './common/useTriangularCenter'
 export * from './common/useCesiumBaseUrl'
+export * from './common/useHowler'
 // math
 export * from './math/useRadianAOB'
 export * from './math/useThreePointCenter'

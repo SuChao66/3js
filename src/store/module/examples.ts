@@ -24,6 +24,7 @@ import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D�
 import earth from '@/assets/images/examples/earth.png' // 地球
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
 import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
+import miGong from '@/assets/images/examples/mi-gong.png' // 迷宫
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -113,7 +114,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 4,
       title: '迷宫',
-      img: inDeveloping,
+      img: miGong,
       desc: '世界上最漫长的路',
       path: 'Migong'
     }
