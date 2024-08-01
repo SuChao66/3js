@@ -27,7 +27,6 @@ export const useHowler = ({
     })
 
     sound.once('load', function () {
-      console.log('加载完成')
       resolve(sound)
     })
 

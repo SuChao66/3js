@@ -7,4 +7,6 @@ export const cameraTarget = new THREE.Vector3(0, 0, 0)
 // 玩家位置
 export const playerPosition = new THREE.Vector3(0, -0.65, 0)
 // 第一人称相机
-export const firstPersonPerspectiveCamera = new THREE.Vector3(0, 0.25, -1.8)
+export const firstPersonPerspectiveCamera = new THREE.Vector3(0, 0.25, 1.8)
+// 第三人称相机
+export const thirdPersonPerspectiveCamera = new THREE.Vector3(0, 0.25, -1.8)

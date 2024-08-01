@@ -38,7 +38,11 @@ import STip from './components/STip/index.vue'
 // 导入类型
 import type { IActions, IKeyStates } from './types'
 // 导入常量
-import { firstPersonPerspectiveCamera, playerPosition } from './constants'
+import {
+  firstPersonPerspectiveCamera,
+  thirdPersonPerspectiveCamera,
+  playerPosition
+} from './constants'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
@@ -70,6 +74,10 @@ const keyStates: IKeyStates = {
   KeyD: false,
   isDown: false
 }
+// 玩家最大速度
+const maxV = 5
+// 是否是第三人称
+let isThirdView = true
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
@@ -84,7 +92,9 @@ let scene: THREE.Scene, // 场景
   cameraEmptyBox: THREE.Object3D, // 相机的父元素
   activeAction: THREE.AnimationAction, // 当前执行的机器人动作
   sound: any, // 玩家行走的声音
-  howler: any // 背景音乐
+  howler: any, // 背景音乐
+  spotLight: any, // 聚光灯
+  directionLight: any // 平行光
 
 // 初始化
 const init = () => {
@@ -92,12 +102,14 @@ const init = () => {
     scene: mScene,
     camera: mCamera,
     renderer: mRenderer,
-    status: mStatus
+    status: mStatus,
+    spotLight: mSpotLight
   } = useThree(document.getElementById('webgl') as HTMLCanvasElement)
   scene = mScene
   camera = mCamera
   status = mStatus
   renderer = mRenderer
+  spotLight = mSpotLight
   // 添加性能监视器
   if (useStatusByEnv()) {
     statusRef.value?.appendChild(mStatus.dom)
@@ -114,26 +126,39 @@ const handleStart = async () => {
     volume: 0.5
   })) as any
   howler.play()
+  // 鼠标锁定
+  handleMouseDown()
 }
 
 // 初始化玩家
 const initPlayer = async () => {
+  // 1.创建一个空对象，用于可视化玩家
   player = new THREE.Object3D()
   player.position.set(0, 0.85, 0)
   scene.add(player)
-  // 添加相机
+  // 2.添加相机，实现跟随效果
   addCamera()
-  // 创建玩家行走的声音源
+  // 3.创建玩家行走的声音源
   sound = await useRunSound({ path: './voice/run.mp3' })
   player.add(sound)
-  console.log(sound)
+  // 4.添加玩家光源
+  player.add(spotLight)
+  spotLight.target = player
+  spotLight.position.z -= 1
+  // 5.默认隐藏平行光
+  directionLight = scene.getObjectByName('平行光')
+  directionLight!.visible = false
 }
 
 // 将相机添加至玩家，实现跟随效果
 const addCamera = () => {
   // 设置相机的位置
   cameraEmptyBox = new THREE.Object3D()
-  camera.position.copy(firstPersonPerspectiveCamera)
+  if (isThirdView) {
+    camera.position.copy(thirdPersonPerspectiveCamera)
+  } else {
+    camera.position.copy(firstPersonPerspectiveCamera)
+  }
   // 设置相机的朝向
   const front = new THREE.Vector3(0, 0, 0)
   player.getWorldDirection(front)
@@ -176,7 +201,7 @@ const initSceneModel = async () => {
 
 // 加载机器人模型
 const initRobotModel = async () => {
-  const gltf: any = await useGLTFModel({ path: './models/xRobot.glb' })
+  const gltf: any = await useGLTFModel({ path: './models/people.glb' })
   const robot = gltf.scene
   robot.scale.set(0.5, 0.5, 0.5)
   robot.position.copy(playerPosition)
@@ -187,12 +212,9 @@ const initRobotModel = async () => {
   for (let i = 0; i < gltf.animations.length; i++) {
     let name = gltf.animations[i].name
     actions[name] = mixer.clipAction(gltf.animations[i])
-    if (name == 'idle' || name == 'walk' || name == 'run') {
+    if (name == 'idle' || name == 'walk') {
       actions[name].clampWhenFinished = false
       actions[name].loop = THREE.LoopRepeat
-    } else {
-      actions[name].clampWhenFinished = true
-      actions[name].loop = THREE.LoopOnce
     }
   }
   activeAction = actions['idle']
@@ -210,7 +232,7 @@ const controlPlayer = (delta: number) => {
     if (
       playerVelocity.x * playerVelocity.x +
         playerVelocity.z * playerVelocity.z <=
-      20
+      maxV
     ) {
       playerVelocity.add(front.multiplyScalar(delta * 2))
     }
@@ -246,8 +268,13 @@ const controlPlayer = (delta: number) => {
   // space：跳跃
   if (keyStates['Space']) {
     playerVelocity.setX(0).setZ(0)
-    if (playerVelocity.y < 5) {
+    if (playerVelocity.y < maxV) {
       playerVelocity.y += 0.5
+    } else {
+      // 打开场景中的平行光
+      if (!directionLight.visible) {
+        directionLight.visible = true
+      }
     }
   }
 }
@@ -256,7 +283,12 @@ const controlPlayer = (delta: number) => {
 const updatePlayer = (delta: number) => {
   // 1.玩家处于地面上
   if (playerOnFloor) {
-    playerVelocity.y = 0 // y方向上的速度为0
+    // y方向上的速度设为0
+    playerVelocity.y = 0
+    // 隐藏场景中的平行光
+    if (directionLight.visible) {
+      directionLight.visible = false
+    }
     // 抬起鼠标，降低速度至0
     if (!keyStates.isDown) {
       playerVelocity.addScaledVector(playerVelocity, damping)
@@ -299,11 +331,9 @@ const playerCollisions = () => {
 const switchPlayerAction = () => {
   if (
     Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) > 0.1 &&
-    Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) <= 3
+    Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) <= maxV
   ) {
     fadeToAction('walk')
-  } else if (Math.abs(playerVelocity.x) + Math.abs(playerVelocity.z) > 3) {
-    fadeToAction('run')
     if (!sound.isPlaying) {
       sound.play()
     }
@@ -366,6 +396,15 @@ const handleKeyDown = (event: any) => {
 const handleKeyUp = (event: any) => {
   keyStates[event.code] = false
   keyStates.isDown = false
+  if (event.code === 'KeyV') {
+    isThirdView = !isThirdView
+    if (isThirdView) {
+      camera.position.z -= 2
+    } else {
+      camera.position.z += 2
+    }
+    camera.updateProjectionMatrix()
+  }
 }
 
 // 鼠标事件

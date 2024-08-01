@@ -7,14 +7,13 @@ import {
   useRenderer,
   useHdr,
   useLights
-  // useAxesHelper
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
 
 export const useThree = (canvas: HTMLCanvasElement) => {
   const { initPerspectiveCamera } = useCamera()
-  const { initAmbientLight, initDirectionalLight } = useLights()
+  const { initAmbientLight, initDirectionalLight, initSpotLight } = useLights()
 
   // 1.1.创建场景
   const scene = useScene()
@@ -25,21 +24,17 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   })
   // 1.3.添加光照
   initAmbientLight({ scene, density: 1 })
+  // 创建平行光
   initDirectionalLight({
-    position: new THREE.Vector3(100, 40, 100),
     scene,
-    name: '平行光1'
+    density: 2,
+    position: new THREE.Vector3(0, 200, 0)
   })
-  initDirectionalLight({
-    position: new THREE.Vector3(-100, 40, -100),
-    scene,
-    name: '平行光2'
+  const { spotLight } = initSpotLight({
+    intensity: 8,
+    distance: 0,
+    angle: Math.PI / 10
   })
-  // 1.4.辅助器
-  // useAxesHelper({
-  //   scene,
-  //   size: 100
-  // })
   // 1.5.创建相机
   const camera = initPerspectiveCamera({
     fov: 45,
@@ -62,6 +57,7 @@ export const useThree = (canvas: HTMLCanvasElement) => {
     scene,
     camera,
     renderer,
-    status
+    status,
+    spotLight
   }
 }

@@ -132,7 +132,6 @@ export const useLights = () => {
    * @param decay 衰减程度
    * @param position 点光源位置
    * @param isShowHelper 是否显示光源辅助器
-   * @param scene 场景
    */
   const initPointLight = ({
     color = 0xffffff,
@@ -141,7 +140,6 @@ export const useLights = () => {
     decay = 2,
     position = new THREE.Vector3(0, 0, 0),
     isShowHelper = false,
-    scene,
     name = '点光源'
   }: {
     color?: number
@@ -150,26 +148,77 @@ export const useLights = () => {
     decay?: number
     position?: THREE.Vector3
     isShowHelper?: boolean
-    scene: THREE.Scene
     name?: string
   }) => {
     const pointLight = new THREE.PointLight(color, density, distance, decay)
     pointLight.position.copy(position)
     pointLight.name = name
+    let pointLightHelper
     if (isShowHelper) {
-      const pointLightHelper = new THREE.PointLightHelper(
-        pointLight,
-        1,
-        0xffff00
-      )
-      scene.add(pointLightHelper)
+      pointLightHelper = new THREE.PointLightHelper(pointLight, 1, 0xffff00)
     }
-    scene.add(pointLight)
+
+    return {
+      pointLight,
+      pointLightHelper
+    }
+  }
+
+  /**
+   * 创建聚光灯
+   * @param color 颜色
+   * @param density 强度
+   * @param distance 距离
+   * @param decay 衰减程度
+   * @param position 点光源位置
+   * @param isShowHelper 是否显示光源辅助器
+   */
+  const initSpotLight = ({
+    color = new THREE.Color(0xffffff),
+    intensity = 1,
+    distance = 10,
+    angle = Math.PI / 3,
+    penumbra = 0,
+    decay = 0.2,
+    position = new THREE.Vector3(0, 1, 0),
+    name = '聚光灯',
+    isShowHelper = false
+  }: {
+    color?: THREE.Color
+    intensity?: number
+    distance?: number
+    angle?: number
+    penumbra?: number
+    decay?: number
+    position?: THREE.Vector3
+    name?: string
+    isShowHelper?: boolean
+  }) => {
+    const spotLight = new THREE.SpotLight(
+      color,
+      intensity,
+      distance,
+      angle,
+      penumbra,
+      decay
+    )
+    spotLight.position.copy(position)
+    spotLight.name = name
+    let spotLightHelper
+    if (isShowHelper) {
+      spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xffff00)
+    }
+
+    return {
+      spotLight,
+      spotLightHelper
+    }
   }
 
   return {
     initAmbientLight,
     initDirectionalLight,
-    initPointLight
+    initPointLight,
+    initSpotLight
   }
 }
