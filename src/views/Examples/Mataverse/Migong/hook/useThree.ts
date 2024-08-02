@@ -6,7 +6,8 @@ import {
   useStatus,
   useRenderer,
   useHdr,
-  useLights
+  useLights,
+  useCSS2DRenderer
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -52,12 +53,15 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   renderer.toneMappingExposure = 2
   // 1.7.初始化性能监视器
   const status = useStatus()
+  // 1.8.初始化css3d渲染器
+  const CSS2DRenderer = useCSS2DRenderer()
 
   return {
     scene,
     camera,
     renderer,
     status,
-    spotLight
+    spotLight,
+    CSS2DRenderer
   }
 }

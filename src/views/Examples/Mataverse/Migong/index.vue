@@ -8,6 +8,8 @@
     </transition>
     <!-- 遮罩层 -->
     <STip v-if="isShowTip" @handleStart="handleStart" />
+    <!-- 标签渲染 -->
+    <div ref="tagRef"></div>
     <!-- canvas画布 -->
     <canvas id="webgl"></canvas>
   </div>
@@ -20,6 +22,11 @@ import * as THREE from 'three'
 import { Octree } from 'three/examples/jsm/math/Octree.js'
 // 导入胶囊
 import { Capsule } from 'three/examples/jsm/math/Capsule.js'
+// 导入CSS3D
+import {
+  CSS2DObject,
+  CSS2DRenderer
+} from 'three/examples/jsm/renderers/CSS2DRenderer'
 // 导入性能监视器
 import Status from 'three/examples/jsm/libs/stats.module'
 // 导入hooks
@@ -29,9 +36,16 @@ import {
   useProgress,
   useGLTFModel,
   useOctree,
-  useHowler
+  useHowler,
+  usePositionAudio
 } from '@/hooks'
-import { useThree, useRunSound } from './hook'
+import {
+  useThree,
+  useRunSound,
+  useChatTag,
+  useChatTagTween,
+  useNpcTween
+} from './hook'
 // 导入组件
 import SLoading from '@/baseui/SLoading/index.vue'
 import STip from './components/STip/index.vue'
@@ -41,13 +55,20 @@ import type { IActions, IKeyStates } from './types'
 import {
   firstPersonPerspectiveCamera,
   thirdPersonPerspectiveCamera,
-  playerPosition
+  playerPosition,
+  girlPosition,
+  playerChatTexts,
+  girlChatTexts
 } from './constants'
+// 导入动画
+import * as TWEEN from '@tweenjs/tween.js'
 
 // 1.定义变量
 const { width, height } = useWindowSize()
 // 性能监视器
 const statusRef = ref<HTMLDivElement | null>(null)
+// 标签渲染
+const tagRef = ref<HTMLDivElement | null>(null)
 // 是否加载进度条
 const isLoading = ref<boolean>(true)
 // 是否展示操作提示
@@ -78,16 +99,28 @@ const keyStates: IKeyStates = {
 const maxV = 5
 // 是否是第三人称
 let isThirdView = true
+// 触发position事件数组
+const eventPositionList: any[] = []
+// 玩家标签
+let playerChatTag: CSS2DObject | null
+// NPC标签
+let girlChatTag: CSS2DObject | null
+// 当前对话的次数
+let currentChatIndex = 0
 
 // 1.定义变量
 let scene: THREE.Scene, // 场景
   camera: THREE.PerspectiveCamera, // 相机
   renderer: THREE.WebGLRenderer, // 渲染器
+  css2Renderer: CSS2DRenderer, // css3渲染器
   status: Status, // 性能监视器
   model: THREE.Group, // 网格模型
   worldOctree: Octree, // 世界八叉树
   capsule: Capsule, // 胶囊体
+  planeGroup: THREE.Group, // 碰撞组
   player: THREE.Object3D, // 玩家
+  robot: any, // 玩家实体模型
+  girl: any, // 女孩
   mixer: THREE.AnimationMixer, // 动画混合器
   cameraEmptyBox: THREE.Object3D, // 相机的父元素
   activeAction: THREE.AnimationAction, // 当前执行的机器人动作
@@ -103,17 +136,21 @@ const init = () => {
     camera: mCamera,
     renderer: mRenderer,
     status: mStatus,
-    spotLight: mSpotLight
+    spotLight: mSpotLight,
+    CSS2DRenderer: mCSS2DRenderer
   } = useThree(document.getElementById('webgl') as HTMLCanvasElement)
   scene = mScene
   camera = mCamera
   status = mStatus
   renderer = mRenderer
   spotLight = mSpotLight
+  css2Renderer = mCSS2DRenderer
   // 添加性能监视器
   if (useStatusByEnv()) {
     statusRef.value?.appendChild(mStatus.dom)
   }
+  // 添加css3DRenderer
+  tagRef.value?.appendChild(css2Renderer.domElement)
 }
 
 // 开始游戏
@@ -128,6 +165,81 @@ const handleStart = async () => {
   howler.play()
   // 鼠标锁定
   handleMouseDown()
+  // 将NPC位置加入位置数组中
+  onPosition(girlPosition, handlePlayerInGirl, handlePlayerOutGirl)
+}
+
+// 进入NPC范围内
+const handlePlayerInGirl = () => {
+  // 1.创建玩家会话标签
+  let playerText: string, grilText: string
+  if (currentChatIndex > playerChatTexts.length) {
+    currentChatIndex = 0
+  }
+  playerText = playerChatTexts[currentChatIndex]
+  grilText = girlChatTexts[currentChatIndex]
+  // 2.创建玩家聊天框
+  playerChatTag = useChatTag({
+    model: robot,
+    text: playerText
+  })
+  const { playerChatIn, playerChatOut, NpcChatIn, NpcChatOut } =
+    useChatTagTween()
+  playerChatIn.start().onComplete(() => {
+    setTimeout(() => {
+      playerChatOut.start().onComplete(() => {
+        robot.remove(playerChatTag)
+        playerChatTag = null
+        // 创建NPC聊天框
+        girlChatTag = useChatTag({
+          model: girl,
+          text: grilText,
+          tagId: 'npc-chat-tag'
+        })
+        NpcChatIn.start().onComplete(() => {
+          setTimeout(() => {
+            NpcChatOut.start().onComplete(() => {
+              girl.remove(girlChatTag)
+              girlChatTag = null
+              // npc渐隐动画执行
+              const npcOutTween = useNpcTween({
+                npc: girl,
+                player: robot
+              })
+              npcOutTween.onComplete((obj) => {
+                // 将NPC新的位置重新添加至eventPositionList数组中
+                eventPositionList.splice(0)
+                onPosition(
+                  obj.position,
+                  handlePlayerInGirl,
+                  handlePlayerOutGirl
+                )
+              })
+            })
+          }, 1500)
+        })
+      })
+    }, 1500)
+  })
+  // 3.修改对话内容下标
+  currentChatIndex++
+}
+
+// 离开NPC范围
+const handlePlayerOutGirl = () => {
+  const { playerChatOut, NpcChatOut } = useChatTagTween()
+  if (playerChatTag) {
+    playerChatOut.start().onComplete(() => {
+      robot.remove(playerChatTag)
+      playerChatTag = null
+    })
+  }
+  if (girlChatTag) {
+    NpcChatOut.start().onComplete(() => {
+      robot.remove(girlChatTag)
+      girlChatTag = null
+    })
+  }
 }
 
 // 初始化玩家
@@ -139,7 +251,7 @@ const initPlayer = async () => {
   // 2.添加相机，实现跟随效果
   addCamera()
   // 3.创建玩家行走的声音源
-  sound = await useRunSound({ path: './voice/run.mp3' })
+  sound = await useRunSound({ path: './voice/walk.mp3' })
   player.add(sound)
   // 4.添加玩家光源
   player.add(spotLight)
@@ -188,7 +300,7 @@ const initSceneModel = async () => {
     isDraco: false
   })
   // 2.设置碰撞组
-  const planeGroup = new THREE.Group()
+  planeGroup = new THREE.Group()
   planeGroup.add(gltf.scene)
   model.add(planeGroup)
   // 3.创建物理世界
@@ -197,12 +309,14 @@ const initSceneModel = async () => {
   capsule = physical.capsule
   // 4.加载机器人模型
   initRobotModel()
+  // 5.加载二次元女生模型
+  initGirlModel()
 }
 
 // 加载机器人模型
 const initRobotModel = async () => {
   const gltf: any = await useGLTFModel({ path: './models/people.glb' })
-  const robot = gltf.scene
+  robot = gltf.scene
   robot.scale.set(0.5, 0.5, 0.5)
   robot.position.copy(playerPosition)
   // 可视化robot
@@ -219,6 +333,26 @@ const initRobotModel = async () => {
   }
   activeAction = actions['idle']
   activeAction && activeAction.play()
+}
+
+// 加载NPC模型
+const initGirlModel = async () => {
+  const gltf: any = await useGLTFModel({
+    path: './models/girl.glb',
+    isDraco: true
+  })
+  girl = gltf.scene
+  girl.scale.set(0.5, 0.5, 0.5)
+  girl.rotation.y = Math.PI
+  girl.position.copy(girlPosition)
+  // 创建NPC声音
+  const girlSound = (await usePositionAudio({
+    path: './voice/xiao_kongbu.mp3',
+    volume: 5
+  })) as any
+  girl.sound = girlSound
+  girl.add(girlSound)
+  model.add(girl)
 }
 
 // 控制玩家行走，前、后、左、右、跳跃
@@ -429,12 +563,49 @@ const handleMouseMove = (event: any) => {
   }
 }
 
+// 监听NPC位置
+const onPosition = (
+  position: THREE.Vector3,
+  inCallback: any,
+  outCallback: any,
+  radius = 2
+) => {
+  const newPosition = position.clone()
+  eventPositionList.push({
+    position: newPosition,
+    inCallback,
+    outCallback,
+    isInner: false,
+    radius
+  })
+}
+
+// 触发位置事件
+const emitPositionEvent = () => {
+  eventPositionList.forEach((item) => {
+    // 计算玩家距离某个点的距离，判断是否触发事件
+    const distanceToSquared = player.position.distanceToSquared(item.position)
+    // 进入
+    if (distanceToSquared < item.radius && item.isInner === false) {
+      item.isInner = true
+      item.inCallback && item.inCallback()
+    }
+    // 离开
+    if (distanceToSquared > item.radius && item.isInner === true) {
+      item.isInner = false
+      item.outCallback && item.outCallback()
+    }
+  })
+}
+
 // 渲染
 const clock = new THREE.Clock()
 const animate = () => {
   const delta = clock.getDelta()
   // 渲染器渲染
   renderer && renderer.render(scene, camera)
+  // css2d
+  css2Renderer && css2Renderer.render(scene!, camera)
   // 请求动画帧
   timer.value = requestAnimationFrame(animate)
   // 更新性能监视器
@@ -447,9 +618,13 @@ const animate = () => {
     controlPlayer(delta)
     // 更新玩家位置
     updatePlayer(delta)
+    // 判断玩家位置，是否进入NPC范围
+    emitPositionEvent()
     // 重置玩家位置
     resetPlayer()
   }
+  // 更新动画时间
+  TWEEN && TWEEN.update()
 }
 
 // 监听窗口的变化
@@ -464,6 +639,9 @@ const handleResize = (width: number, height: number) => {
   // 重新设置输出画布大小
   if (renderer) {
     renderer.setSize(width, height)
+  }
+  if (css2Renderer) {
+    css2Renderer.setSize(width, height)
   }
 }
 

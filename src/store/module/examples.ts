@@ -92,10 +92,10 @@ const useExampleStore = defineStore('examples', () => {
   const metaverseExamples = reactive<ICard[]>([
     {
       key: 1,
-      title: '未来智慧城',
-      img: futureSmartCity,
-      desc: '在未来智慧城中进行3D漫游',
-      path: 'FutureSmartCity'
+      title: '迷宫',
+      img: miGong,
+      desc: '世界上最漫长的路',
+      path: 'Migong'
     },
     {
       key: 2,
@@ -113,10 +113,10 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 4,
-      title: '迷宫',
-      img: miGong,
-      desc: '世界上最漫长的路',
-      path: 'Migong'
+      title: '未来智慧城',
+      img: futureSmartCity,
+      desc: '在未来智慧城中进行3D漫游',
+      path: 'FutureSmartCity'
     }
   ])
   // 3.3D展览

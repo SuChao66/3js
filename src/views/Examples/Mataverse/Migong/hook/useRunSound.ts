@@ -6,7 +6,7 @@ export const useRunSound = async ({ path }: { path: string }) => {
   const sound = (await usePositionAudio({
     path,
     loop: true,
-    volume: 5
+    volume: 2
   })) as any
 
   return sound

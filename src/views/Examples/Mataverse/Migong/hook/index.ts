@@ -1,2 +1,5 @@
 export * from './useThree'
 export * from './useRunSound'
+export * from './useChatTag'
+export * from './useChatTagTween'
+export * from './useNpcTween'
