@@ -106,13 +106,20 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 3,
+      title: '城市猎人',
+      img: inDeveloping,
+      desc: '罪恶都市，守护一方和平',
+      path: 'CityHunter'
+    },
+    {
+      key: 4,
       title: '古堡传奇',
       img: tombRdider,
       desc: '中世纪的皇室贵族',
       path: 'TombRaider'
     },
     {
-      key: 4,
+      key: 5,
       title: '未来智慧城',
       img: futureSmartCity,
       desc: '在未来智慧城中进行3D漫游',

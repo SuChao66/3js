@@ -38,6 +38,15 @@ const MataverseRoutes: Array<RouteRecordRaw> = [
       title: 'Migong'
     },
     component: () => import('@/views/Examples/Mataverse/Migong/index.vue')
+  },
+  // 5.城市猎人
+  {
+    name: 'CityHunter',
+    path: '/cityHunter',
+    meta: {
+      title: 'CityHunter'
+    },
+    component: () => import('@/views/Examples/Mataverse/CityHunter/index.vue')
   }
 ]
 
