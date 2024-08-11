@@ -84,3 +84,8 @@ export * from './flyPath/useCatmullRomFlyPath'
 export * from './flyPath/useFlowLine'
 // 物理
 export * from './physical/useOctree'
+// yuka
+export * from './yuka/useVehicle'
+export * from './yuka/useYukaPath'
+export * from './yuka/useGameEntity'
+export * from './yuka/useNavMesh'

@@ -25,6 +25,7 @@ import earth from '@/assets/images/examples/earth.png' // 地球
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
 import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
 import miGong from '@/assets/images/examples/mi-gong.png' // 迷宫
+import cityHunter from '@/assets/images/examples/city-hunter.png' // 城市猎人
 import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
@@ -107,7 +108,7 @@ const useExampleStore = defineStore('examples', () => {
     {
       key: 3,
       title: '城市猎人',
-      img: inDeveloping,
+      img: cityHunter,
       desc: '罪恶都市，守护一方和平',
       path: 'CityHunter'
     },

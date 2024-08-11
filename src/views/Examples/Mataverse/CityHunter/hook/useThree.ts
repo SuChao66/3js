@@ -6,7 +6,8 @@ import {
   useStatus,
   useRenderer,
   useHdr,
-  useLights
+  useLights,
+  useControls
 } from '@/hooks'
 // 导入常量
 import { cameraPos, cameraTarget } from '../constants'
@@ -14,12 +15,13 @@ import { cameraPos, cameraTarget } from '../constants'
 export const useThree = (canvas: HTMLCanvasElement) => {
   const { initPerspectiveCamera } = useCamera()
   const { initAmbientLight } = useLights()
+  const { initControls } = useControls()
 
   // 1.1.创建场景
   const scene = useScene()
   // 1.2.设置背景
   useHdr({
-    path: './hdr/sky1.hdr',
+    path: './hdr/sky2.hdr',
     scene
   })
   // 1.3.添加光照
@@ -41,11 +43,17 @@ export const useThree = (canvas: HTMLCanvasElement) => {
   renderer.toneMappingExposure = 2
   // 1.7.初始化性能监视器
   const status = useStatus()
+  // 1.8.初始化控制器
+  const controls = initControls({ camera, renderer })
+  // 设置上下旋转的角度
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(89)
+  controls.maxDistance = 30
 
   return {
     scene,
     camera,
     renderer,
-    status
+    status,
+    controls
   }
 }

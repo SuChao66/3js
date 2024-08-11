@@ -16,3 +16,5 @@ declare module '*.glsl' {
 }
 
 declare module 'howler'
+
+declare module 'yuka'
