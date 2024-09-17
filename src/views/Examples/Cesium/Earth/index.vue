@@ -12,12 +12,13 @@ import * as Cesium from 'cesium'
 import 'cesium/Build/Cesium/Widgets/widgets.css'
 // 导入hook
 import { useCesiumBaseUrl } from '@/hooks'
+import { usePlaneFlyLine } from './hook/usePlaneFlyLine'
 // 导入store
 import { useStore } from '@/store'
 
 // 设置CESIUM_BASE_URL
 const cesiumBaseUrl = useCesiumBaseUrl()
-window.CESIUM_BASE_URL = cesiumBaseUrl
+;(window as any).cesiumBaseUrl = cesiumBaseUrl
 // 设置Cesium的token
 const { global } = useStore()
 Cesium.Ion.defaultAccessToken = global.defaultAccessToken
@@ -26,16 +27,16 @@ Cesium.Ion.defaultAccessToken = global.defaultAccessToken
 const cesiumContainer = ref<HTMLDivElement | null>(null)
 
 // 设置cesium的默认视角
-Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
-  // 西边的经度
-  89.5,
-  // 南边纬度
-  20.4,
-  // 东边的经度
-  110.4,
-  // 北边的纬度
-  61.2
-)
+// Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(
+//   // 西边的经度
+//   89.5,
+//   // 南边纬度
+//   20.4,
+//   // 东边的经度
+//   110.4,
+//   // 北边的纬度
+//   61.2
+// )
 
 const init = () => {
   // 创建查看器
@@ -53,25 +54,16 @@ const init = () => {
     // 是否显示右上角帮助按钮
     navigationHelpButton: false,
     // 是否显示底下的动画播放按钮
-    animation: false,
+    animation: true,
     // 是否显示底下的时间轴
-    timeline: false,
+    timeline: true,
     // 是否现实全屏按钮
     fullscreenButton: false
-    // 设置天空盒子
-    // skyBox: new Cesium.SkyBox({
-    //   sources: {
-    //     positiveX: '',
-    //     negativeX: '',
-    //     positiveY: '',
-    //     negativeY: '',
-    //     positiveZ: '',
-    //     negativeZ: ''
-    //   }
-    // })
   })
   // 隐藏查看器底下的  logo
   ;(viewer.cesiumWidget.creditContainer as any).style.display = 'none'
+  // 飞行航向图
+  usePlaneFlyLine(viewer)
 }
 
 onMounted(() => {

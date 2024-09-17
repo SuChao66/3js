@@ -21,12 +21,12 @@ import waterFlow from '@/assets/images/examples/water-flow.png' // 烟云水雾�
 import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
 import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
-import earth from '@/assets/images/examples/earth.png' // 地球
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
 import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
 import miGong from '@/assets/images/examples/mi-gong.png' // 迷宫
 import cityHunter from '@/assets/images/examples/city-hunter.png' // 城市猎人
-import inDeveloping from '@/assets/images/in-developing.png'
+import flyLine from '@/assets/images/examples/3d-flyLine.png' // 航线
+// import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
@@ -210,9 +210,9 @@ const useExampleStore = defineStore('examples', () => {
   const cesiumExamples = reactive<ICard[]>([
     {
       key: 1,
-      title: '地球可视化',
-      img: earth,
-      desc: '使用Cesium实现地球可视化',
+      title: '飞行航线',
+      img: flyLine,
+      desc: '绘制动态路线实现飞行航线',
       path: 'Earth'
     }
   ])
