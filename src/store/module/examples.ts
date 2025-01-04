@@ -22,11 +22,11 @@ import starsSea from '@/assets/images/examples/stars-sea.png' // 星辰大海
 import Hourse from '@/assets/images/examples/3d-hourse.png' // 全景看房
 import exhibitionHall from '@/assets/images/examples/exhibition-hall.png' // 3D展厅
 import futureSmartCity from '@/assets/images/examples/future-smart-city.png' // 未来智慧城（元宇宙）
-import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
+// import tombRdider from '@/assets/images/examples/tomb-rdider.png' // 古堡传奇
 import miGong from '@/assets/images/examples/mi-gong.png' // 迷宫
 import cityHunter from '@/assets/images/examples/city-hunter.png' // 城市猎人
 import flyLine from '@/assets/images/examples/3d-flyLine.png' // 航线
-// import inDeveloping from '@/assets/images/in-developing.png'
+import inDeveloping from '@/assets/images/in-developing.png'
 
 const useExampleStore = defineStore('examples', () => {
   // 1.数字孪生案例
@@ -114,18 +114,18 @@ const useExampleStore = defineStore('examples', () => {
     },
     {
       key: 4,
-      title: '古堡传奇',
-      img: tombRdider,
-      desc: '中世纪的皇室贵族',
-      path: 'TombRaider'
-    },
-    {
-      key: 5,
       title: '未来智慧城',
       img: futureSmartCity,
       desc: '在未来智慧城中进行3D漫游',
       path: 'FutureSmartCity'
     }
+    // {
+    //   key: 4,
+    //   title: '古堡传奇',
+    //   img: tombRdider,
+    //   desc: '中世纪的皇室贵族',
+    //   path: 'TombRaider'
+    // },
   ])
   // 3.3D展览
   const exhibitionExamples = reactive<ICard[]>([
@@ -213,7 +213,14 @@ const useExampleStore = defineStore('examples', () => {
       title: '飞行航线',
       img: flyLine,
       desc: '绘制动态路线实现飞行航线',
-      path: 'Earth'
+      path: 'FlyLine'
+    },
+    {
+      key: 2,
+      title: '人间天堂',
+      img: inDeveloping,
+      desc: '西湖美景盖世无双',
+      path: 'EastLaker'
     }
   ])
 

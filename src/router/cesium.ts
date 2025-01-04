@@ -2,14 +2,23 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 const CesiumRoutes: Array<RouteRecordRaw> = [
-  // 1.粒子群效果
+  // 1.飞行航线
   {
-    name: 'Earth',
-    path: '/earth',
+    name: 'FlyLine',
+    path: '/flyline',
     meta: {
-      title: 'Earth'
+      title: 'FlyLine'
     },
-    component: () => import('@/views/Examples/Cesium/Earth/index.vue')
+    component: () => import('@/views/Examples/Cesium/FlyLine/index.vue')
+  },
+  // 1.西湖美景
+  {
+    name: 'EastLaker',
+    path: '/eastLaker',
+    meta: {
+      title: 'EastLaker'
+    },
+    component: () => import('@/views/Examples/Cesium/EastLaker/index.vue')
   }
 ]
 
